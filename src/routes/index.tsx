@@ -1,22 +1,130 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 
-export const Route = createFileRoute("/")({
-  component: Index,
-});
+export const Route = createFileRoute("/")({ component: Index });
 
- const EMAIL = "Katongoleshane@gmail.com";
-const WHATSAPP = "256700000000";
+const EMAIL = "katongoleshane@gmail.com";
 
-function TopBar() {
+/* ---------------- Custom Cursor ---------------- */
+function useCustomCursor() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    if (!fine) return;
+
+    const dot = document.createElement("div");
+    const ring = document.createElement("div");
+    dot.style.cssText =
+      "position:fixed;top:0;left:0;width:8px;height:8px;border-radius:50%;background:#00C8FF;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .18s ease, opacity .18s ease;";
+    ring.style.cssText =
+      "position:fixed;top:0;left:0;width:32px;height:32px;border-radius:50%;border:1.5px solid #00C8FF;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s ease, height .25s ease, opacity .25s ease, border-color .25s ease;";
+    document.body.appendChild(dot);
+    document.body.appendChild(ring);
+    document.documentElement.classList.add("has-custom-cursor");
+
+    let mx = window.innerWidth / 2,
+      my = window.innerHeight / 2;
+    let rx = mx,
+      ry = my;
+    let hovering = false;
+    let raf = 0;
+
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX;
+      my = e.clientY;
+      dot.style.left = mx + "px";
+      dot.style.top = my + "px";
+    };
+    const loop = () => {
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      ring.style.left = rx + "px";
+      ring.style.top = ry + "px";
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+
+    const setHover = (on: boolean) => {
+      if (on === hovering) return;
+      hovering = on;
+      if (on) {
+        dot.style.transform = "translate(-50%,-50%) scale(0)";
+        ring.style.width = "48px";
+        ring.style.height = "48px";
+        ring.style.opacity = "0.5";
+      } else {
+        dot.style.transform = "translate(-50%,-50%) scale(1)";
+        ring.style.width = "32px";
+        ring.style.height = "32px";
+        ring.style.opacity = "1";
+      }
+    };
+    const onOver = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest("a,button,[data-cursor='hover']")) setHover(true);
+      else setHover(false);
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseover", onOver);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseover", onOver);
+      dot.remove();
+      ring.remove();
+      document.documentElement.classList.remove("has-custom-cursor");
+    };
+  }, []);
+}
+
+/* ---------------- Reveal on scroll ---------------- */
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll<HTMLElement>(".reveal");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            const el = e.target as HTMLElement;
+            const delay = el.dataset.delay || "0";
+            el.style.transitionDelay = `${delay}ms`;
+            el.classList.add("is-visible");
+            io.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.15 },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+}
+
+/* ---------------- Nav ---------------- */
+function Nav() {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const onScroll = () => {
+      if (!ref.current) return;
+      if (window.scrollY > 24) ref.current.classList.add("is-scrolled");
+      else ref.current.classList.remove("is-scrolled");
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[#0a0f1a]/70 border-b border-white/5">
+    <header
+      ref={ref}
+      className="fixed top-0 inset-x-0 z-40 transition-all duration-300 rise [animation-delay:.3s] [&.is-scrolled]:bg-[rgba(8,12,20,0.85)] [&.is-scrolled]:backdrop-blur-md"
+    >
       <div className="max-w-7xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
-        <a href="#top" className="font-display text-2xl tracking-tight">
-          Virello<span className="text-[#00C8FF]">.</span>
+        <a href="#top" className="font-display text-[22px] text-white tracking-tight">
+          Virello
         </a>
         <a
           href={`mailto:${EMAIL}`}
-          className="text-sm text-white/80 hover:text-[#00C8FF] transition-colors border-b border-transparent hover:border-[#00C8FF] pb-0.5"
+          className="text-[13px] font-medium px-4 py-2 rounded-full border border-[rgba(0,200,255,0.4)] text-[#00C8FF] hover:bg-[rgba(0,200,255,0.1)] transition-colors"
         >
           Get in touch
         </a>
@@ -25,138 +133,259 @@ function TopBar() {
   );
 }
 
+/* ---------------- Hero ---------------- */
 function Hero() {
   return (
-    <section id="top" className="relative pt-40 pb-32 md:pt-56 md:pb-44 px-6 md:px-10 overflow-hidden">
+    <section
+      id="top"
+      className="relative min-h-screen flex items-center px-6 md:px-10 overflow-hidden"
+    >
       <div className="noise-overlay" />
-      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#00C8FF]/5 blur-3xl pointer-events-none" />
-      <div className="relative max-w-7xl mx-auto">
-        <div className="max-w-4xl">
-          <p className="text-[#00C8FF] text-sm tracking-[0.2em] uppercase mb-8">Web design agency · Kampala</p>
-          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] text-white">
-            We build fast.<br />We build well.
+      {/* Right-side decorative grid */}
+      <svg
+        aria-hidden
+        className="absolute right-0 top-0 h-full w-1/2 pointer-events-none hidden md:block"
+        style={{ opacity: 0.06 }}
+        viewBox="0 0 600 800"
+        preserveAspectRatio="xMaxYMid slice"
+      >
+        <defs>
+          <pattern id="dotgrid" width="28" height="28" patternUnits="userSpaceOnUse">
+            <circle cx="1.5" cy="1.5" r="1.5" fill="#00C8FF" />
+          </pattern>
+        </defs>
+        <rect width="600" height="800" fill="url(#dotgrid)" />
+        <rect x="120" y="120" width="320" height="120" fill="none" stroke="#00C8FF" strokeWidth="1" />
+        <rect x="200" y="220" width="280" height="180" fill="none" stroke="#00C8FF" strokeWidth="1" />
+        <rect x="80" y="360" width="360" height="160" fill="none" stroke="#00C8FF" strokeWidth="1" />
+      </svg>
+
+      <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-10 items-center pt-32 pb-24">
+        <div className="md:col-span-8">
+          <h1 className="font-display text-white leading-[1.02] tracking-tight text-[42px] md:text-[72px]">
+            <span className="block rise">Digital products</span>
+            <span className="block rise [animation-delay:.1s]">crafted for</span>
+            <span className="block italic text-[#00C8FF] rise [animation-delay:.2s]">
+              East Africa.
+            </span>
           </h1>
-          <p className="mt-10 text-lg md:text-xl text-white/70 max-w-2xl leading-relaxed">
-            Virello ships web products and SaaS for East African businesses using Lovable + Supabase.
+          <p className="mt-8 max-w-xl text-[16px] text-[#7a8a9a] leading-relaxed rise [animation-delay:.35s]">
+            Virello is a web design studio building websites and digital products for businesses
+            across Uganda and East Africa. We turn ideas into fast, polished, conversion-ready
+            experiences.
           </p>
-          <div className="mt-12 flex flex-wrap gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#7a8a9a] rise [animation-delay:.45s]">
+            <span>5 projects live</span>
+            <span className="text-[#00C8FF]">·</span>
+            <span>2–3 week delivery</span>
+            <span className="text-[#00C8FF]">·</span>
+            <span>Kampala-based</span>
+          </div>
+          <div className="mt-12 rise [animation-delay:.55s]">
             <a
-              href="#projects"
-              className="group inline-flex items-center gap-2 bg-[#00C8FF] text-[#0a0f1a] px-7 py-3.5 font-medium hover:bg-white transition-colors"
+              href="#work"
+              className="inline-block border border-[#00C8FF] text-[#00C8FF] px-7 py-3 text-[14px] font-medium hover:bg-[rgba(0,200,255,0.1)] transition-colors"
             >
               See our work
-              <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
-            <a
-              href={`mailto:${EMAIL}`}
-              className="inline-flex items-center gap-2 border border-white/20 text-white px-7 py-3.5 font-medium hover:border-[#00C8FF] hover:text-[#00C8FF] transition-colors"
-            >
-              Get in touch
             </a>
           </div>
-        </div>
-
-        <div className="mt-20 md:mt-28 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl border-t border-white/10 pt-10">
-          {[
-            ["8+", "projects shipped"],
-            ["~2 week", "delivery"],
-            ["Uganda", "based"],
-          ].map(([k, v]) => (
-            <div key={k}>
-              <div className="font-display text-3xl md:text-4xl text-white">{k}</div>
-              <div className="text-sm text-white/50 mt-1">{v}</div>
-            </div>
-          ))}
         </div>
       </div>
     </section>
   );
 }
 
+/* ---------------- Projects ---------------- */
 type Project = {
-  title: string;
+  name: string;
+  url: string;
   tag: string;
   description: string;
   stack: string[];
-  featured?: boolean;
-  href: string;
 };
 
 const PROJECTS: Project[] = [
   {
-    title: "Chess Uganda",
-    tag: "Live · SaaS",
-    description:
-      "Coaching directory connecting chess players to coaches in Uganda. Built with Lovable + Supabase. Mobile money payments (MTN/Airtel) with admin-issued access codes.",
-    stack: ["Lovable", "Supabase", "React", "TypeScript"],
-    featured: true,
-    href: "#",
+    name: "Lenore Estates",
+    url: "https://kampala-dream-homes.lovable.app",
+    tag: "Real Estate",
+    description: "Premium property listings platform for Kampala's luxury real estate market.",
+    stack: ["React", "Supabase", "Tailwind"],
   },
   {
-    title: "Virello Agency Site",
-    tag: "Live · Agency",
+    name: "Smart Ideas Limited",
+    url: "https://smart-ideas.lovable.app/",
+    tag: "Consulting",
     description:
-      "The Virello agency website — dark navy aesthetic, editorial layout, scroll-driven animations. Deployed on Cloudflare Pages.",
-    stack: ["Lovable", "Cloudflare Pages", "Tailwind"],
-    href: "#",
-  },
-  {
-    title: "Smart Ideas Limited",
-    tag: "Client · Consulting",
-    description:
-      "Homepage for an institutional consulting firm. Cormorant Garamond typography, dark hero with red accents, Framer Motion animations. Delivered in a single-pass.",
+      "Institutional consulting firm homepage with capacity building and training services.",
     stack: ["React", "Framer Motion", "TypeScript"],
-    href: "#",
+  },
+  {
+    name: "MetaFit256",
+    url: "https://metafit256.katongoleshane.workers.dev/",
+    tag: "Fitness",
+    description: "Premier gym in Kampala — strength training, elite coaching, and group fitness.",
+    stack: ["React", "Cloudflare Workers", "Tailwind"],
+  },
+  {
+    name: "Roofman UG Constructors",
+    url: "https://roofman-ug-builds-trust.lovable.app",
+    tag: "Construction",
+    description: "Professional roofing and waterproofing contractors serving Kampala and beyond.",
+    stack: ["React", "Tailwind", "Lovable"],
+  },
+  {
+    name: "Silverfin Swimming Club",
+    url: "https://silverfin-academy.lovable.app",
+    tag: "Sports",
+    description: "Premium swimming programs and elite competition coaching for all ages.",
+    stack: ["React", "Supabase", "Tailwind"],
   },
 ];
 
-function ProjectCard({ p, index }: { p: Project; index: number }) {
+function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: number }) {
   return (
     <article
-      className={`group relative p-8 md:p-10 border transition-all hover:-translate-y-1 ${
-        p.featured
-          ? "border-[#00C8FF]/60 bg-[#00C8FF]/[0.03]"
-          : "border-white/10 bg-white/[0.015] hover:border-white/25"
-      }`}
+      className="glass rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1 reveal"
+      data-delay={delay}
+      style={{ borderColor: undefined }}
+      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(0,200,255,0.3)")}
+      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "")}
     >
-      <div className="flex items-center justify-between mb-6">
-        <span className="text-xs tracking-[0.2em] uppercase text-[#00C8FF]">{p.tag}</span>
-        <span className="font-display text-white/20 text-lg">0{index + 1}</span>
-      </div>
-      <h3 className="font-display text-3xl md:text-4xl text-white mb-4">{p.title}</h3>
-      <p className="text-white/65 leading-relaxed mb-8">{p.description}</p>
-      <div className="flex flex-wrap gap-2 mb-8">
-        {p.stack.map((s) => (
-          <span key={s} className="text-xs px-3 py-1.5 border border-white/15 text-white/70">
-            {s}
-          </span>
-        ))}
-      </div>
-      <a
-        href={p.href}
-        className="inline-flex items-center gap-2 text-[#00C8FF] border-b border-[#00C8FF]/40 pb-1 hover:border-[#00C8FF] transition-colors"
+      <div
+        className="relative w-full overflow-hidden"
+        style={{ height: tall ? 320 : 220, pointerEvents: "none" }}
       >
-        View project <span className="transition-transform group-hover:translate-x-1">→</span>
-      </a>
+        <iframe
+          src={p.url}
+          title={p.name}
+          loading="lazy"
+          scrolling="no"
+          className="w-full h-full border-0 block"
+          style={{ pointerEvents: "none" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#080c14]/30" />
+      </div>
+      <div className="p-5">
+        <span
+          className="inline-block text-[10px] uppercase tracking-[0.12em] px-2.5 py-[3px] rounded-full"
+          style={{
+            background: "rgba(0,200,255,0.08)",
+            color: "#00C8FF",
+            border: "1px solid rgba(0,200,255,0.2)",
+          }}
+        >
+          {p.tag}
+        </span>
+        <h3 className="font-display text-[22px] text-white mt-3">{p.name}</h3>
+        <p className="text-[13px] text-[#7a8a9a] mt-1.5 leading-relaxed">{p.description}</p>
+        <div className="mt-5 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex flex-wrap gap-1.5">
+            {p.stack.map((s) => (
+              <span
+                key={s}
+                className="text-[11px] px-2 py-1 rounded-full border text-[#7a8a9a]"
+                style={{ borderColor: "rgba(255,255,255,0.1)" }}
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-[12px] text-[#00C8FF] hover:underline"
+          >
+            Visit site →
+          </a>
+        </div>
+      </div>
     </article>
   );
 }
 
 function Projects() {
+  // Stagger: col A = 0,2,4 ; col B = 1,3
+  const colA = [PROJECTS[0], PROJECTS[2], PROJECTS[4]];
+  const colB = [PROJECTS[1], PROJECTS[3]];
   return (
-    <section id="projects" className="px-6 md:px-10 py-24 md:py-32 border-t border-white/5">
+    <section id="work" className="px-6 md:px-10 py-28 md:py-40 relative">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-16 flex-wrap gap-6">
-          <div>
-            <p className="text-[#00C8FF] text-sm tracking-[0.2em] uppercase mb-4">Portfolio</p>
-            <h2 className="font-display text-4xl md:text-6xl text-white">Selected Works</h2>
-          </div>
-          <p className="text-white/50 max-w-xs">A handful of products we've shipped recently.</p>
+        <div className="mb-14 reveal">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-[#7a8a9a]">
+            Client projects · 2024–2025
+          </p>
+          <h2 className="font-display text-white text-[40px] md:text-[48px] mt-3">
+            Selected Works
+          </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {PROJECTS.map((p, i) => (
-            <div key={p.title} className={p.featured ? "md:col-span-2" : ""}>
-              <ProjectCard p={p} index={i} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+          <div className="flex flex-col gap-6 md:gap-8">
+            <ProjectCard p={colA[0]} tall delay={0} />
+            <ProjectCard p={colA[1]} delay={200} />
+            <ProjectCard p={colA[2]} tall delay={400} />
+          </div>
+          <div className="flex flex-col gap-6 md:gap-8 md:mt-16">
+            <ProjectCard p={colB[0]} delay={100} />
+            <ProjectCard p={colB[1]} tall delay={300} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Services ---------------- */
+function IconLayout() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M3 9h18M9 21V9" />
+    </svg>
+  );
+}
+function IconLaptop() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="12" rx="1" />
+      <path d="M2 20h20" />
+    </svg>
+  );
+}
+function IconRocket() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 13a8 8 0 0 1 7-7 13 13 0 0 1 9 9 8 8 0 0 1-7 7l-5-5z" />
+      <circle cx="15" cy="9" r="1.5" />
+      <path d="M7 14l-3 3 3 3 3-3" />
+    </svg>
+  );
+}
+
+const SERVICES = [
+  { icon: <IconLayout />, title: "Web Design", body: "Custom-built websites that reflect your brand and convert visitors." },
+  { icon: <IconLaptop />, title: "SaaS Products", body: "Full-stack web apps with auth, databases, and payment integrations." },
+  { icon: <IconRocket />, title: "Digital Presence", body: "Landing pages, product pages, and launch-ready sites shipped fast." },
+];
+
+function Services() {
+  return (
+    <section className="px-6 md:px-10 py-24 md:py-32">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="font-display text-white text-[32px] md:text-[40px] mb-12 reveal">
+          What we do
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {SERVICES.map((s, i) => (
+            <div
+              key={s.title}
+              className="glass rounded-2xl p-7 reveal transition-colors hover:!border-[rgba(0,200,255,0.25)]"
+              data-delay={i * 100}
+            >
+              <div>{s.icon}</div>
+              <h3 className="font-display text-[22px] text-white mt-5">{s.title}</h3>
+              <p className="text-[13px] text-[#7a8a9a] mt-2 leading-relaxed">{s.body}</p>
             </div>
           ))}
         </div>
@@ -165,83 +394,51 @@ function Projects() {
   );
 }
 
-function Stack() {
-  const tools = ["Lovable", "Supabase", "React", "TypeScript", "Tailwind CSS", "Cloudflare Pages"];
-  return (
-    <section className="px-6 md:px-10 py-24 md:py-32 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <p className="text-[#00C8FF] text-sm tracking-[0.2em] uppercase mb-4">Toolkit</p>
-        <h2 className="font-display text-4xl md:text-6xl text-white mb-12">How we build</h2>
-        <div className="flex flex-wrap gap-3 mb-10">
-          {tools.map((t) => (
-            <span
-              key={t}
-              className="inline-flex items-center gap-2 px-5 py-3 border border-white/15 text-white/85 hover:border-[#00C8FF] hover:text-[#00C8FF] transition-colors"
-            >
-              <span className="w-1.5 h-1.5 bg-[#00C8FF] rounded-full" />
-              {t}
-            </span>
-          ))}
-        </div>
-        <p className="text-white/65 text-lg max-w-3xl leading-relaxed">
-          We use Lovable to move fast without sacrificing quality. Supabase handles auth, database, and storage.
-          <br className="hidden md:block" />
-          Everything is deployed to production from day one.
-        </p>
-      </div>
-    </section>
-  );
-}
-
+/* ---------------- Contact ---------------- */
 function Contact() {
   return (
-    <section id="contact" className="px-6 md:px-10 py-24 md:py-36 bg-[#0d1420] border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <p className="text-[#00C8FF] text-sm tracking-[0.2em] uppercase mb-6">Contact</p>
-        <h2 className="font-display text-5xl md:text-7xl text-white mb-6">Let's build something</h2>
-        <p className="text-white/60 text-lg max-w-2xl mb-14">
-          Based in Kampala. Working with clients across Uganda and East Africa.
+    <section className="px-6 md:px-10 py-28 md:py-36" style={{ background: "#0d1322" }}>
+      <div className="max-w-[560px] mx-auto glass rounded-2xl p-10 md:p-14 text-center reveal">
+        <h2 className="font-display italic text-white text-[40px] md:text-[52px] leading-tight">
+          Let's build something.
+        </h2>
+        <p className="mt-5 text-[15px] text-[#7a8a9a] leading-relaxed">
+          Based in Kampala. Building for East Africa and beyond. Reach out and let's talk about your
+          project.
         </p>
         <a
           href={`mailto:${EMAIL}`}
-          className="font-display text-3xl sm:text-5xl md:text-6xl text-white underline decoration-[#00C8FF] decoration-2 underline-offset-8 hover:text-[#00C8FF] transition-colors break-all"
+          className="font-display text-[#00C8FF] text-[20px] md:text-[24px] mt-8 inline-block hover:underline break-all"
         >
           {EMAIL}
         </a>
-        <div className="mt-14">
-          <a
-            href={`https://wa.me/${WHATSAPP}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 border border-white/20 px-6 py-3 text-white hover:border-[#00C8FF] hover:text-[#00C8FF] transition-colors"
-          >
-            <span className="w-2 h-2 bg-[#00C8FF] rounded-full" />
-            WhatsApp us
-          </a>
-        </div>
       </div>
     </section>
   );
 }
 
+/* ---------------- Footer ---------------- */
 function Footer() {
   return (
-    <footer className="px-6 md:px-10 py-10 border-t border-white/5">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm text-white/40">
-        <div className="font-display text-lg text-white/70">Virello<span className="text-[#00C8FF]">.</span></div>
-        <div>© {new Date().getFullYear()} Virello — Kampala, Uganda</div>
+    <footer className="px-6 md:px-10 py-8">
+      <div className="max-w-7xl mx-auto flex items-center justify-between text-[12px] text-[#7a8a9a]">
+        <span>© 2025 Virello</span>
+        <span>Kampala, Uganda</span>
       </div>
     </footer>
   );
 }
 
+/* ---------------- Page ---------------- */
 function Index() {
+  useCustomCursor();
+  useReveal();
   return (
-    <main className="min-h-screen bg-[#0a0f1a] text-white">
-      <TopBar />
+    <main className="min-h-screen bg-[#080c14] text-white">
+      <Nav />
       <Hero />
       <Projects />
-      <Stack />
+      <Services />
       <Contact />
       <Footer />
     </main>
