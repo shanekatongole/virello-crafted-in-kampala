@@ -4,7 +4,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const EMAIL = "hello@virello.agency";
+ const EMAIL = "Katongoleshane@gmail.com";
 const WHATSAPP = "256700000000";
 
 function TopBar() {
