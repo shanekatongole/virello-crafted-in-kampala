@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Virello — Web Design Agency in Kampala, Uganda" },
-      { name: "description", content: "Virello ships web products and SaaS for East African businesses using Lovable + Supabase. Based in Kampala, Uganda." },
+      { title: "Virello — Web Design Studio, Kampala" },
+      { name: "description", content: "Virello is a Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa." },
       { name: "author", content: "Virello" },
-      { property: "og:title", content: "Virello — Web Design Agency in Kampala, Uganda" },
-      { property: "og:description", content: "We build fast. We build well. Web products and SaaS for East African businesses." },
+      { property: "og:title", content: "Virello — Web Design Studio, Kampala" },
+      { property: "og:description", content: "Virello is a Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Virello" },
+      { name: "twitter:title", content: "Virello — Web Design Studio, Kampala" },
+      { name: "twitter:description", content: "Virello is a Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e5981d1a-73f2-495c-89d7-071f07897634/id-preview-79595615--bd94c1ae-d21f-4a97-9312-59879cc6ff3b.lovable.app-1779038894626.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e5981d1a-73f2-495c-89d7-071f07897634/id-preview-79595615--bd94c1ae-d21f-4a97-9312-59879cc6ff3b.lovable.app-1779038894626.png" },
     ],
     links: [
       {
