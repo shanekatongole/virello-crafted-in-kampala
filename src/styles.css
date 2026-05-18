@@ -57,6 +57,19 @@
   border-color: rgba(0,200,255,0.2) !important;
 }
 
+.service-card {
+  transition: border-color .35s ease, box-shadow .35s ease, transform .35s ease;
+}
+.service-card:hover {
+  border-color: rgba(0,200,255,0.45) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,200,255,0.35),
+    0 0 24px rgba(0,200,255,0.25),
+    0 0 60px rgba(0,200,255,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  transform: translateY(-4px);
+}
+
 .glass {
   background: rgba(255,255,255,0.035);
   border: 1px solid rgba(255,255,255,0.07);
