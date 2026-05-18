@@ -9,8 +9,8 @@ const EMAIL = "katongoleshane@gmail.com";
 function useCustomCursor() {
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const fine = window.matchMedia("(pointer: fine)").matches;
-    if (!fine) return;
+    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    if (isTouch) return;
 
     const dot = document.createElement("div");
     const ring = document.createElement("div");
@@ -435,7 +435,6 @@ function IconRocket() {
 
 const SERVICES = [
   { icon: <IconLayout />, title: "Web Design", body: "Custom-built websites that reflect your brand and convert visitors." },
-  { icon: <IconLaptop />, title: "SaaS Products", body: "Full-stack web apps with auth, databases, and payment integrations." },
   { icon: <IconRocket />, title: "Digital Presence", body: "Landing pages, product pages, and launch-ready sites shipped fast." },
 ];
 
@@ -446,11 +445,11 @@ function Services() {
         <h2 className="font-display text-white text-[32px] md:text-[40px] mb-12 reveal">
           What we do
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {SERVICES.map((s, i) => (
             <div
               key={s.title}
-              className="glass rounded-2xl p-7 reveal transition-colors hover:!border-[rgba(0,200,255,0.25)]"
+              className="glass rounded-2xl p-7 reveal service-card"
               data-delay={i * 100}
             >
               <div>{s.icon}</div>
@@ -492,7 +491,7 @@ function Footer() {
   return (
     <footer className="px-6 md:px-10 py-8">
       <div className="max-w-7xl mx-auto flex items-center justify-between text-[12px] text-[#7a8a9a]">
-        <span>© 2025 Virello</span>
+        <span>© 2026 Virello</span>
         <span>Kampala, Uganda</span>
       </div>
     </footer>
