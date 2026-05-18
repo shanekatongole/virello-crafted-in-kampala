@@ -244,17 +244,34 @@ const PROJECTS: Project[] = [
 ];
 
 function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: number }) {
+  const iframeH = tall === undefined ? 200 : tall ? 220 : 160;
   return (
     <article
-      className="glass rounded-2xl overflow-hidden group transition-all duration-300 hover:-translate-y-1 reveal"
+      className="overflow-hidden group reveal"
       data-delay={delay}
-      style={{ borderColor: undefined }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(0,200,255,0.3)")}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "")}
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.09)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        borderRadius: 20,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+        transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "rgba(0,200,255,0.35)";
+        e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,200,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)";
+        e.currentTarget.style.transform = "translateY(-6px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)";
+        e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
     >
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: tall ? 320 : 220, pointerEvents: "none" }}
+        style={{ height: iframeH, pointerEvents: "none" }}
       >
         <iframe
           src={p.url}
@@ -268,24 +285,49 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
       </div>
       <div className="p-5">
         <span
-          className="inline-block text-[10px] uppercase tracking-[0.12em] px-2.5 py-[3px] rounded-full"
           style={{
-            background: "rgba(0,200,255,0.08)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontFamily: '"DM Sans", sans-serif',
+            fontSize: 10,
+            fontWeight: 500,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
             color: "#00C8FF",
-            border: "1px solid rgba(0,200,255,0.2)",
+            background: "rgba(0,200,255,0.07)",
+            border: "1px solid rgba(0,200,255,0.22)",
+            borderRadius: 999,
+            padding: "4px 12px",
           }}
         >
+          <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#00C8FF", display: "inline-block" }} />
           {p.tag}
         </span>
-        <h3 className="font-display text-[22px] text-white mt-3">{p.name}</h3>
-        <p className="text-[13px] text-[#7a8a9a] mt-1.5 leading-relaxed">{p.description}</p>
+        <h3
+          className="font-display"
+          style={{ fontSize: 26, fontWeight: 400, color: "#fff", letterSpacing: "-0.01em", margin: "10px 0 6px" }}
+        >
+          {p.name}
+        </h3>
+        <p style={{ fontFamily: '"DM Sans", sans-serif', fontSize: 13, color: "#7a8a9a", lineHeight: 1.6 }}>
+          {p.description}
+        </p>
         <div className="mt-5 flex items-center justify-between flex-wrap gap-3">
           <div className="flex flex-wrap gap-1.5">
             {p.stack.map((s) => (
               <span
                 key={s}
-                className="text-[11px] px-2 py-1 rounded-full border text-[#7a8a9a]"
-                style={{ borderColor: "rgba(255,255,255,0.1)" }}
+                className="stack-chip"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  color: "#a0aec0",
+                  padding: "3px 9px",
+                  fontFamily: '"DM Sans", sans-serif',
+                }}
               >
                 {s}
               </span>
@@ -295,9 +337,17 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
             href={p.url}
             target="_blank"
             rel="noreferrer noopener"
-            className="text-[12px] text-[#00C8FF] hover:underline"
+            className="visit-link"
+            style={{
+              fontFamily: '"DM Sans", sans-serif',
+              fontSize: 12,
+              fontWeight: 500,
+              color: "#00C8FF",
+              letterSpacing: "0.04em",
+              textDecoration: "none",
+            }}
           >
-            Visit site →
+            Visit site <span className="arrow">→</span>
           </a>
         </div>
       </div>
@@ -306,30 +356,50 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
 }
 
 function Projects() {
-  // Stagger: col A = 0,2,4 ; col B = 1,3
-  const colA = [PROJECTS[0], PROJECTS[2], PROJECTS[4]];
-  const colB = [PROJECTS[1], PROJECTS[3]];
+  const left = [PROJECTS[0], PROJECTS[2]];
+  const right = [PROJECTS[1], PROJECTS[3]];
+  const odd = PROJECTS[4];
   return (
     <section id="work" className="px-6 md:px-10 py-28 md:py-40 relative">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-14 reveal">
-          <p className="text-[11px] uppercase tracking-[0.15em] text-[#7a8a9a]">
-            Client projects · 2024–2025
-          </p>
-          <h2 className="font-display text-white text-[40px] md:text-[48px] mt-3">
+        <div className="reveal" style={{ marginBottom: 48 }}>
+          <h2
+            style={{
+              fontFamily: '"Cormorant Garamond", serif',
+              fontWeight: 400,
+              color: "#fff",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.05,
+              fontSize: "clamp(40px, 6vw, 64px)",
+            }}
+          >
             Selected Works
           </h2>
+          <p
+            style={{
+              fontFamily: '"DM Sans", sans-serif',
+              fontSize: 11,
+              color: "#7a8a9a",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              marginTop: 8,
+            }}
+          >
+            Client projects · 2024–2025
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
           <div className="flex flex-col gap-6 md:gap-8">
-            <ProjectCard p={colA[0]} tall delay={0} />
-            <ProjectCard p={colA[1]} delay={200} />
-            <ProjectCard p={colA[2]} tall delay={400} />
+            <ProjectCard p={left[0]} tall delay={0} />
+            <ProjectCard p={left[1]} tall delay={200} />
           </div>
-          <div className="flex flex-col gap-6 md:gap-8 md:mt-16">
-            <ProjectCard p={colB[0]} delay={100} />
-            <ProjectCard p={colB[1]} tall delay={300} />
+          <div className="flex flex-col gap-6 md:gap-8 md:mt-12">
+            <ProjectCard p={right[0]} tall={false} delay={100} />
+            <ProjectCard p={right[1]} tall={false} delay={300} />
           </div>
+        </div>
+        <div className="mt-6 md:mt-8 mx-auto w-full md:w-1/2">
+          <ProjectCard p={odd} delay={500} />
         </div>
       </div>
     </section>
@@ -434,13 +504,16 @@ function Index() {
   useCustomCursor();
   useReveal();
   return (
-    <main className="min-h-screen bg-[#080c14] text-white">
-      <Nav />
-      <Hero />
-      <Projects />
-      <Services />
-      <Contact />
-      <Footer />
+    <main className="min-h-screen text-white relative" style={{ background: "#080c14" }}>
+      <div className="global-noise" aria-hidden />
+      <div className="relative" style={{ zIndex: 1 }}>
+        <Nav />
+        <Hero />
+        <Projects />
+        <Services />
+        <Contact />
+        <Footer />
+      </div>
     </main>
   );
 }
