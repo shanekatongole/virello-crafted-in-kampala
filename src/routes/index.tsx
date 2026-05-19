@@ -450,12 +450,95 @@ function Contact() {
 /* ---------------- Footer ---------------- */
 function Footer() {
   return (
-    <footer className="px-6 md:px-10 py-8">
-      <div className="max-w-7xl mx-auto flex items-center justify-between text-[12px] text-[#7a8a9a]">
-        <span>© 2026 Virello</span>
-        <span>Kampala, Uganda</span>
+    <footer className="px-6 md:px-10 py-12 border-t border-white/5">
+      <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3 text-[13px] text-[#7a8a9a]">
+        <div>
+          <div className="font-display text-white text-[22px] mb-2">Virello</div>
+          <p className="leading-relaxed">Web design studio. Kampala, Uganda.</p>
+          <a href={`mailto:${EMAIL}`} className="mt-3 inline-block text-[#00C8FF] hover:underline">
+            {EMAIL}
+          </a>
+        </div>
+        <div>
+          <div className="uppercase tracking-[0.15em] text-[11px] text-white/60 mb-3">Work</div>
+          <ul className="space-y-1.5">
+            {PROJECTS.map((p) => (
+              <li key={p.slug}>
+                <Link to="/work/$slug" params={{ slug: p.slug }} className="hover:text-[#00C8FF] transition-colors">
+                  {p.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="md:text-right md:self-end">© 2026 Virello · Kampala, Uganda</div>
       </div>
     </footer>
+  );
+}
+
+/* ---------------- Process strip ---------------- */
+function Process() {
+  const steps = [
+    { n: "01", k: "Discover", v: "30-min call. We scope the project, agree timeline and price upfront." },
+    { n: "02", k: "Design & build", v: "2–3 weeks. One round of revisions. You see progress every few days." },
+    { n: "03", k: "Launch", v: "We ship, train you on edits, and stay available for 30 days of support." },
+  ];
+  return (
+    <section className="px-6 md:px-10 pb-8 md:pb-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {steps.map((s, i) => (
+            <div
+              key={s.n}
+              className="glass rounded-2xl p-6 md:p-7 reveal"
+              data-delay={i * 100}
+            >
+              <div className="flex items-baseline gap-3 mb-3">
+                <span className="text-[#00C8FF] font-display text-[20px]">{s.n}</span>
+                <span className="uppercase tracking-[0.18em] text-[11px] text-white/60">{s.k}</span>
+              </div>
+              <p className="text-[14px] text-white/85 leading-relaxed">{s.v}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-[13px] text-[#7a8a9a] text-center reveal">
+          Fixed scope · Fixed timeline · No retainers required.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Sticky CTA ---------------- */
+function StickyCTA() {
+  return (
+    <section className="px-6 md:px-10 py-16 md:py-24">
+      <div
+        className="max-w-5xl mx-auto rounded-3xl p-10 md:p-16 reveal relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(0,200,255,0.08), rgba(255,255,255,0.02))",
+          border: "1px solid rgba(0,200,255,0.25)",
+        }}
+      >
+        <div className="grid md:grid-cols-[1fr_auto] items-center gap-8">
+          <div>
+            <h3 className="font-display italic text-white text-[36px] md:text-[52px] leading-[1.05]">
+              Like what you see?
+            </h3>
+            <p className="mt-4 text-[15px] md:text-[16px] text-white/75 max-w-xl leading-relaxed">
+              Tell us about your project. We reply within one business day — usually faster.
+            </p>
+          </div>
+          <a
+            href={MAILTO}
+            className="inline-block bg-[#00C8FF] text-[#080c14] px-7 py-4 text-[14px] font-semibold tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap"
+          >
+            Start a project →
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -469,7 +552,9 @@ function Index() {
       <div className="relative" style={{ zIndex: 1 }}>
         <Nav />
         <Hero />
+        <Process />
         <Projects />
+        <StickyCTA />
         <Services />
         <Contact />
         <Footer />
