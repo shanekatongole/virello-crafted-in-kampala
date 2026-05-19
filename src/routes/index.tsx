@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { PROJECTS } from "@/lib/projects";
+import { ProjectPreview } from "@/components/ProjectPreview";
 
 export const Route = createFileRoute("/")({ component: Index });
 
 const EMAIL = "katongoleshane@gmail.com";
+const MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent("New project enquiry")}`;
 
 /* ---------------- Custom Cursor ---------------- */
 function useCustomCursor() {
@@ -61,6 +65,12 @@ function useCustomCursor() {
     };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
+      if (t && t.closest("[data-cursor='hide']")) {
+        dot.style.opacity = "0";
+        ring.style.opacity = "0";
+        return;
+      }
+      dot.style.opacity = "1";
       if (t && t.closest("a,button,[data-cursor='hover']")) setHover(true);
       else setHover(false);
     };
@@ -196,54 +206,19 @@ function Hero() {
 }
 
 /* ---------------- Projects ---------------- */
-type Project = {
-  name: string;
-  url: string;
-  tag: string;
-  description: string;
-  stack: string[];
-};
+type ProjectLike = (typeof PROJECTS)[number];
 
-const PROJECTS: Project[] = [
-  {
-    name: "Lenore Estates",
-    url: "https://kampala-dream-homes.lovable.app",
-    tag: "Real Estate",
-    description: "Premium property listings platform for Kampala's luxury real estate market.",
-    stack: ["React", "Supabase", "Tailwind"],
-  },
-  {
-    name: "Smart Ideas Limited",
-    url: "https://smart-ideas.lovable.app/",
-    tag: "Consulting",
-    description:
-      "Institutional consulting firm homepage with capacity building and training services.",
-    stack: ["React", "Framer Motion", "TypeScript"],
-  },
-  {
-    name: "MetaFit256",
-    url: "https://metafit256.katongoleshane.workers.dev/",
-    tag: "Fitness",
-    description: "Premier gym in Kampala — strength training, elite coaching, and group fitness.",
-    stack: ["React", "Cloudflare Workers", "Tailwind"],
-  },
-  {
-    name: "Roofman UG Constructors",
-    url: "https://roofman-ug-builds-trust.lovable.app",
-    tag: "Construction",
-    description: "Professional roofing and waterproofing contractors serving Kampala and beyond.",
-    stack: ["React", "Tailwind", "Lovable"],
-  },
-  {
-    name: "Silverfin Swimming Club",
-    url: "https://silverfin-academy.lovable.app",
-    tag: "Sports",
-    description: "Premium swimming programs and elite competition coaching for all ages.",
-    stack: ["React", "Supabase", "Tailwind"],
-  },
-];
-
-function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: number }) {
+function ProjectCard({
+  p,
+  tall,
+  delay,
+  priority,
+}: {
+  p: ProjectLike;
+  tall?: boolean;
+  delay: number;
+  priority?: boolean;
+}) {
   const iframeH = tall === undefined ? 200 : tall ? 220 : 160;
   return (
     <article
@@ -269,20 +244,7 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
         e.currentTarget.style.transform = "translateY(0)";
       }}
     >
-      <div
-        className="relative w-full overflow-hidden"
-        style={{ height: iframeH, pointerEvents: "none" }}
-      >
-        <iframe
-          src={p.url}
-          title={p.name}
-          loading="lazy"
-          scrolling="no"
-          className="w-full h-full border-0 block"
-          style={{ pointerEvents: "none" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#080c14]/30" />
-      </div>
+      <ProjectPreview project={p} priority={priority} height={iframeH} />
       <div className="p-5">
         <span
           style={{
@@ -333,10 +295,9 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
               </span>
             ))}
           </div>
-          <a
-            href={p.url}
-            target="_blank"
-            rel="noreferrer noopener"
+          <Link
+            to="/work/$slug"
+            params={{ slug: p.slug }}
             className="visit-link"
             style={{
               fontFamily: '"DM Sans", sans-serif',
@@ -347,8 +308,8 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
               textDecoration: "none",
             }}
           >
-            Visit site <span className="arrow">→</span>
-          </a>
+            Case study <span className="arrow">→</span>
+          </Link>
         </div>
       </div>
     </article>
@@ -390,7 +351,7 @@ function Projects() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
           <div className="flex flex-col gap-6 md:gap-8">
-            <ProjectCard p={left[0]} tall delay={0} />
+            <ProjectCard p={left[0]} tall delay={0} priority />
             <ProjectCard p={left[1]} tall delay={200} />
           </div>
           <div className="flex flex-col gap-6 md:gap-8 md:mt-12">
