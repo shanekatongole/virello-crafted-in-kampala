@@ -129,7 +129,7 @@ function CaseStudy() {
             </div>
 
             <div className="mt-16 flex flex-wrap gap-2">
-              {project.stack.map((s) => (
+              {project.stack.map((s: string) => (
                 <span
                   key={s}
                   className="text-[12px] px-3 py-1.5 rounded-md"
