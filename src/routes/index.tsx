@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { PROJECTS } from "@/lib/projects";
+import { ProjectPreview } from "@/components/ProjectPreview";
 
 export const Route = createFileRoute("/")({ component: Index });
 
 const EMAIL = "katongoleshane@gmail.com";
+const MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent("New project enquiry")}`;
 
 /* ---------------- Custom Cursor ---------------- */
 function useCustomCursor() {
@@ -61,6 +65,12 @@ function useCustomCursor() {
     };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
+      if (t && t.closest("[data-cursor='hide']")) {
+        dot.style.opacity = "0";
+        ring.style.opacity = "0";
+        return;
+      }
+      dot.style.opacity = "1";
       if (t && t.closest("a,button,[data-cursor='hover']")) setHover(true);
       else setHover(false);
     };
@@ -196,54 +206,19 @@ function Hero() {
 }
 
 /* ---------------- Projects ---------------- */
-type Project = {
-  name: string;
-  url: string;
-  tag: string;
-  description: string;
-  stack: string[];
-};
+type ProjectLike = (typeof PROJECTS)[number];
 
-const PROJECTS: Project[] = [
-  {
-    name: "Lenore Estates",
-    url: "https://kampala-dream-homes.lovable.app",
-    tag: "Real Estate",
-    description: "Premium property listings platform for Kampala's luxury real estate market.",
-    stack: ["React", "Supabase", "Tailwind"],
-  },
-  {
-    name: "Smart Ideas Limited",
-    url: "https://smart-ideas.lovable.app/",
-    tag: "Consulting",
-    description:
-      "Institutional consulting firm homepage with capacity building and training services.",
-    stack: ["React", "Framer Motion", "TypeScript"],
-  },
-  {
-    name: "MetaFit256",
-    url: "https://metafit256.katongoleshane.workers.dev/",
-    tag: "Fitness",
-    description: "Premier gym in Kampala — strength training, elite coaching, and group fitness.",
-    stack: ["React", "Cloudflare Workers", "Tailwind"],
-  },
-  {
-    name: "Roofman UG Constructors",
-    url: "https://roofman-ug-builds-trust.lovable.app",
-    tag: "Construction",
-    description: "Professional roofing and waterproofing contractors serving Kampala and beyond.",
-    stack: ["React", "Tailwind", "Lovable"],
-  },
-  {
-    name: "Silverfin Swimming Club",
-    url: "https://silverfin-academy.lovable.app",
-    tag: "Sports",
-    description: "Premium swimming programs and elite competition coaching for all ages.",
-    stack: ["React", "Supabase", "Tailwind"],
-  },
-];
-
-function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: number }) {
+function ProjectCard({
+  p,
+  tall,
+  delay,
+  priority,
+}: {
+  p: ProjectLike;
+  tall?: boolean;
+  delay: number;
+  priority?: boolean;
+}) {
   const iframeH = tall === undefined ? 200 : tall ? 220 : 160;
   return (
     <article
@@ -269,20 +244,7 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
         e.currentTarget.style.transform = "translateY(0)";
       }}
     >
-      <div
-        className="relative w-full overflow-hidden"
-        style={{ height: iframeH, pointerEvents: "none" }}
-      >
-        <iframe
-          src={p.url}
-          title={p.name}
-          loading="lazy"
-          scrolling="no"
-          className="w-full h-full border-0 block"
-          style={{ pointerEvents: "none" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#080c14]/30" />
-      </div>
+      <ProjectPreview project={p} priority={priority} height={iframeH} />
       <div className="p-5">
         <span
           style={{
@@ -333,10 +295,9 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
               </span>
             ))}
           </div>
-          <a
-            href={p.url}
-            target="_blank"
-            rel="noreferrer noopener"
+          <Link
+            to="/work/$slug"
+            params={{ slug: p.slug }}
             className="visit-link"
             style={{
               fontFamily: '"DM Sans", sans-serif',
@@ -347,8 +308,8 @@ function ProjectCard({ p, tall, delay }: { p: Project; tall?: boolean; delay: nu
               textDecoration: "none",
             }}
           >
-            Visit site <span className="arrow">→</span>
-          </a>
+            Case study <span className="arrow">→</span>
+          </Link>
         </div>
       </div>
     </article>
@@ -390,7 +351,7 @@ function Projects() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
           <div className="flex flex-col gap-6 md:gap-8">
-            <ProjectCard p={left[0]} tall delay={0} />
+            <ProjectCard p={left[0]} tall delay={0} priority />
             <ProjectCard p={left[1]} tall delay={200} />
           </div>
           <div className="flex flex-col gap-6 md:gap-8 md:mt-12">
@@ -489,12 +450,95 @@ function Contact() {
 /* ---------------- Footer ---------------- */
 function Footer() {
   return (
-    <footer className="px-6 md:px-10 py-8">
-      <div className="max-w-7xl mx-auto flex items-center justify-between text-[12px] text-[#7a8a9a]">
-        <span>© 2026 Virello</span>
-        <span>Kampala, Uganda</span>
+    <footer className="px-6 md:px-10 py-12 border-t border-white/5">
+      <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3 text-[13px] text-[#7a8a9a]">
+        <div>
+          <div className="font-display text-white text-[22px] mb-2">Virello</div>
+          <p className="leading-relaxed">Web design studio. Kampala, Uganda.</p>
+          <a href={`mailto:${EMAIL}`} className="mt-3 inline-block text-[#00C8FF] hover:underline">
+            {EMAIL}
+          </a>
+        </div>
+        <div>
+          <div className="uppercase tracking-[0.15em] text-[11px] text-white/60 mb-3">Work</div>
+          <ul className="space-y-1.5">
+            {PROJECTS.map((p) => (
+              <li key={p.slug}>
+                <Link to="/work/$slug" params={{ slug: p.slug }} className="hover:text-[#00C8FF] transition-colors">
+                  {p.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="md:text-right md:self-end">© 2026 Virello · Kampala, Uganda</div>
       </div>
     </footer>
+  );
+}
+
+/* ---------------- Process strip ---------------- */
+function Process() {
+  const steps = [
+    { n: "01", k: "Discover", v: "30-min call. We scope the project, agree timeline and price upfront." },
+    { n: "02", k: "Design & build", v: "2–3 weeks. One round of revisions. You see progress every few days." },
+    { n: "03", k: "Launch", v: "We ship, train you on edits, and stay available for 30 days of support." },
+  ];
+  return (
+    <section className="px-6 md:px-10 pb-8 md:pb-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {steps.map((s, i) => (
+            <div
+              key={s.n}
+              className="glass rounded-2xl p-6 md:p-7 reveal"
+              data-delay={i * 100}
+            >
+              <div className="flex items-baseline gap-3 mb-3">
+                <span className="text-[#00C8FF] font-display text-[20px]">{s.n}</span>
+                <span className="uppercase tracking-[0.18em] text-[11px] text-white/60">{s.k}</span>
+              </div>
+              <p className="text-[14px] text-white/85 leading-relaxed">{s.v}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-[13px] text-[#7a8a9a] text-center reveal">
+          Fixed scope · Fixed timeline · No retainers required.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Sticky CTA ---------------- */
+function StickyCTA() {
+  return (
+    <section className="px-6 md:px-10 py-16 md:py-24">
+      <div
+        className="max-w-5xl mx-auto rounded-3xl p-10 md:p-16 reveal relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(0,200,255,0.08), rgba(255,255,255,0.02))",
+          border: "1px solid rgba(0,200,255,0.25)",
+        }}
+      >
+        <div className="grid md:grid-cols-[1fr_auto] items-center gap-8">
+          <div>
+            <h3 className="font-display italic text-white text-[36px] md:text-[52px] leading-[1.05]">
+              Like what you see?
+            </h3>
+            <p className="mt-4 text-[15px] md:text-[16px] text-white/75 max-w-xl leading-relaxed">
+              Tell us about your project. We reply within one business day — usually faster.
+            </p>
+          </div>
+          <a
+            href={MAILTO}
+            className="inline-block bg-[#00C8FF] text-[#080c14] px-7 py-4 text-[14px] font-semibold tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap"
+          >
+            Start a project →
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -508,7 +552,9 @@ function Index() {
       <div className="relative" style={{ zIndex: 1 }}>
         <Nav />
         <Hero />
+        <Process />
         <Projects />
+        <StickyCTA />
         <Services />
         <Contact />
         <Footer />
