@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://virellosites.lovable.app/sitemap.xml
