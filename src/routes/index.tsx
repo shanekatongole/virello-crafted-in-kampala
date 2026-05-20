@@ -3,11 +3,12 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { PROJECTS } from "@/lib/projects";
 import { ProjectPreview } from "@/components/ProjectPreview";
+import { STUDIO_EMAIL, mailtoSubject, PRICING, formatUGX, STARTING_PRICE_DISPLAY } from "@/lib/constants";
 
 export const Route = createFileRoute("/")({ component: Index });
 
-const EMAIL = "katongoleshane@gmail.com";
-const MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent("New project enquiry")}`;
+const EMAIL = STUDIO_EMAIL;
+const MAILTO = mailtoSubject("New project enquiry");
 
 /* ---------------- Custom Cursor ---------------- */
 function useCustomCursor() {
@@ -503,7 +504,7 @@ function Process() {
           ))}
         </div>
         <p className="mt-6 text-[13px] text-[#7a8a9a] text-center reveal">
-          Fixed scope · Fixed timeline · No retainers required.
+          From {STARTING_PRICE_DISPLAY} · Fixed scope · Fixed timeline · No retainers required.
         </p>
       </div>
     </section>
@@ -554,6 +555,7 @@ function Index() {
         <Hero />
         <Process />
         <Projects />
+        <Pricing />
         <StickyCTA />
         <Services />
         <Contact />
