@@ -512,6 +512,149 @@ function Process() {
 }
 
 /* ---------------- Sticky CTA ---------------- */
+function Pricing() {
+  return (
+    <section id="pricing" className="px-6 md:px-10 py-24 md:py-32">
+      <div className="max-w-7xl mx-auto">
+        <div className="reveal mb-12 md:mb-16">
+          <h2
+            style={{
+              fontFamily: '"Cormorant Garamond", serif',
+              fontWeight: 400,
+              color: "#fff",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.05,
+              fontSize: "clamp(40px, 6vw, 64px)",
+            }}
+          >
+            Pricing
+          </h2>
+          <p
+            style={{
+              fontFamily: '"DM Sans", sans-serif',
+              fontSize: 11,
+              color: "#7a8a9a",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              marginTop: 8,
+            }}
+          >
+            Transparent · Fixed scope · {PRICING.paymentTerms}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
+          {PRICING.packages.map((pkg, i) => (
+            <div
+              key={pkg.id}
+              className="glass rounded-2xl p-8 reveal relative flex flex-col"
+              data-delay={i * 100}
+              style={
+                pkg.highlight
+                  ? {
+                      border: "1px solid rgba(0,200,255,0.45)",
+                      boxShadow: "0 12px 40px rgba(0,200,255,0.08), inset 0 1px 0 rgba(255,255,255,0.08)",
+                    }
+                  : undefined
+              }
+            >
+              {pkg.highlight && (
+                <span
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.15em]"
+                  style={{
+                    background: "#00C8FF",
+                    color: "#080c14",
+                    borderRadius: 999,
+                    fontFamily: '"DM Sans", sans-serif',
+                  }}
+                >
+                  Most Popular
+                </span>
+              )}
+
+              <h3 className="font-display text-white text-[28px] leading-tight">
+                {pkg.name}
+              </h3>
+
+              <div className="mt-4 flex items-baseline gap-1">
+                {pkg.pricePrefix && (
+                  <span className="text-[14px] text-[#7a8a9a]">{pkg.pricePrefix}</span>
+                )}
+                <span className="font-display text-white text-[34px] md:text-[40px]">
+                  {formatUGX(pkg.price)}
+                </span>
+              </div>
+
+              <p className="mt-3 text-[13px] text-[#7a8a9a] leading-relaxed">
+                {pkg.tagline}
+              </p>
+
+              <ul className="mt-6 space-y-2.5 flex-1">
+                {pkg.features.map((f) => (
+                  <li
+                    key={f}
+                    className="flex items-start gap-3 text-[13.5px] text-white/85 leading-relaxed"
+                  >
+                    <span className="text-[#00C8FF] mt-[2px]">✓</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href={mailtoSubject(`New project — ${pkg.name} package`)}
+                className="mt-8 inline-block text-center px-6 py-3 text-[13px] font-semibold transition-opacity"
+                style={
+                  pkg.highlight
+                    ? { background: "#00C8FF", color: "#080c14" }
+                    : {
+                        border: "1px solid #00C8FF",
+                        color: "#00C8FF",
+                        background: "transparent",
+                      }
+                }
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "0.85";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.opacity = "1";
+                }}
+              >
+                Get started →
+              </a>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 md:mt-16 glass rounded-2xl p-8 reveal">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-5">
+            Optional add-ons
+          </div>
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+            {PRICING.addons.map((addon) => (
+              <li
+                key={addon.name}
+                className="flex items-baseline justify-between gap-4 pb-3 border-b border-white/5 sm:border-b-0"
+              >
+                <span className="text-[14px] text-white/85">{addon.name}</span>
+                <span className="font-display text-[18px] text-[#00C8FF] whitespace-nowrap">
+                  {formatUGX(addon.price)}
+                  <span className="text-[12px] text-[#7a8a9a]">{addon.unit}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="mt-8 text-center text-[12px] text-[#7a8a9a] reveal">
+          {PRICING.paymentTerms} · All prices in Ugandan Shillings · No hidden fees
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Sticky CTA ---------------- */
 function StickyCTA() {
   return (
     <section className="px-6 md:px-10 py-16 md:py-24">
