@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getProject, PROJECTS, PROJECT_IMAGES } from "@/lib/projects";
+import { STUDIO_EMAIL, mailtoSubject } from "@/lib/constants";
 
 const SITE = "https://virellosites.lovable.app";
-const EMAIL = "katongoleshane@gmail.com";
+const EMAIL = STUDIO_EMAIL;
 
 export const Route = createFileRoute("/work/$slug")({
   loader: ({ params }) => {
@@ -64,9 +65,7 @@ export const Route = createFileRoute("/work/$slug")({
 function CaseStudy() {
   const { project } = Route.useLoaderData();
   const img = PROJECT_IMAGES[project.slug];
-  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(
-    `New project — similar to ${project.name}`,
-  )}`;
+  const mailto = mailtoSubject(`New project — similar to ${project.name}`);
   const others = PROJECTS.filter((p) => p.slug !== project.slug).slice(0, 3);
 
   return (
