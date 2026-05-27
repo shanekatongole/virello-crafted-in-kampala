@@ -131,8 +131,14 @@ function Nav() {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
         <a href="#top" className="font-display text-[22px] text-white tracking-tight">
-          Virello
+          Virello<span className="text-[#00C8FF]">.</span>
         </a>
+        <nav className="hidden md:flex items-center gap-9 text-[13px] text-white/70">
+          <a href="#work" className="hover:text-[#00C8FF] transition-colors">Selected Work</a>
+          <a href="#about" className="hover:text-[#00C8FF] transition-colors">About</a>
+          <a href="#pricing" className="hover:text-[#00C8FF] transition-colors">Pricing</a>
+          <a href="#contact" className="hover:text-[#00C8FF] transition-colors">Contact</a>
+        </nav>
         <a
           href={`mailto:${EMAIL}`}
           className="text-[13px] font-medium px-4 py-2 rounded-full border border-[rgba(0,200,255,0.4)] text-[#00C8FF] hover:bg-[rgba(0,200,255,0.1)] transition-colors"
