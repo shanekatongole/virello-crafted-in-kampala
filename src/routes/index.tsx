@@ -131,8 +131,14 @@ function Nav() {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
         <a href="#top" className="font-display text-[22px] text-white tracking-tight">
-          Virello
+          Virello<span className="text-[#00C8FF]">.</span>
         </a>
+        <nav className="hidden md:flex items-center gap-9 text-[13px] text-white/70">
+          <a href="#work" className="hover:text-[#00C8FF] transition-colors">Selected Work</a>
+          <a href="#about" className="hover:text-[#00C8FF] transition-colors">About</a>
+          <a href="#pricing" className="hover:text-[#00C8FF] transition-colors">Pricing</a>
+          <a href="#contact" className="hover:text-[#00C8FF] transition-colors">Contact</a>
+        </nav>
         <a
           href={`mailto:${EMAIL}`}
           className="text-[13px] font-medium px-4 py-2 rounded-full border border-[rgba(0,200,255,0.4)] text-[#00C8FF] hover:bg-[rgba(0,200,255,0.1)] transition-colors"
@@ -149,56 +155,70 @@ function Hero() {
   return (
     <section
       id="top"
-      className="relative min-h-screen flex items-center px-6 md:px-10 overflow-hidden"
+      className="relative min-h-screen px-6 md:px-10 overflow-hidden pt-28 pb-16"
     >
       <div className="noise-overlay" />
-      {/* Right-side decorative grid */}
-      <svg
-        aria-hidden
-        className="absolute right-0 top-0 h-full w-1/2 pointer-events-none hidden md:block"
-        style={{ opacity: 0.06 }}
-        viewBox="0 0 600 800"
-        preserveAspectRatio="xMaxYMid slice"
-      >
-        <defs>
-          <pattern id="dotgrid" width="28" height="28" patternUnits="userSpaceOnUse">
-            <circle cx="1.5" cy="1.5" r="1.5" fill="#00C8FF" />
-          </pattern>
-        </defs>
-        <rect width="600" height="800" fill="url(#dotgrid)" />
-        <rect x="120" y="120" width="320" height="120" fill="none" stroke="#00C8FF" strokeWidth="1" />
-        <rect x="200" y="220" width="280" height="180" fill="none" stroke="#00C8FF" strokeWidth="1" />
-        <rect x="80" y="360" width="360" height="160" fill="none" stroke="#00C8FF" strokeWidth="1" />
-      </svg>
-
-      <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-10 items-center pt-32 pb-24">
-        <div className="md:col-span-8">
-          <h1 className="font-display text-white leading-[1.02] tracking-tight text-[42px] md:text-[72px]">
-            <span className="block rise">Digital products</span>
-            <span className="block rise [animation-delay:.1s]">crafted for</span>
-            <span className="block italic text-[#00C8FF] rise [animation-delay:.2s]">
-              East Africa.
+      <div className="relative max-w-7xl mx-auto w-full">
+        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-white/55 rise">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-[#00C8FF] opacity-60 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00C8FF]" />
             </span>
-          </h1>
-          <p className="mt-8 max-w-xl text-[16px] text-[#7a8a9a] leading-relaxed rise [animation-delay:.35s]">
-            Virello is a web design studio building websites and digital products for businesses
-            across Uganda and East Africa. We turn ideas into fast, polished, conversion-ready
-            experiences.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#7a8a9a] rise [animation-delay:.45s]">
-            <span>5 projects live</span>
-            <span className="text-[#00C8FF]">·</span>
-            <span>2–3 week delivery</span>
-            <span className="text-[#00C8FF]">·</span>
-            <span>Kampala-based</span>
+            <span className="text-[#00C8FF]">Online</span>
           </div>
-          <div className="mt-12 rise [animation-delay:.55s]">
-            <a
-              href="#work"
-              className="inline-block border border-[#00C8FF] text-[#00C8FF] px-7 py-3 text-[14px] font-medium hover:bg-[rgba(0,200,255,0.1)] transition-colors"
-            >
-              See our work
+          <div>Est. 2024 — Kampala, UG</div>
+        </div>
+
+        <div className="mt-10 md:mt-14">
+          <h1 className="font-display text-white leading-[0.92] tracking-[-0.02em] text-[68px] sm:text-[110px] md:text-[150px] lg:text-[180px]">
+            <span className="block rise">Virello</span>
+            <span className="block italic text-[#00C8FF] rise [animation-delay:.1s]">Studio.</span>
+          </h1>
+        </div>
+
+        <div className="mt-12 md:mt-16 grid md:grid-cols-12 gap-10 items-end">
+          <div className="md:col-span-6 rise [animation-delay:.25s]">
+            <p className="text-[16px] md:text-[18px] text-white/75 leading-relaxed max-w-xl">
+              A web design studio crafting fast, polished, conversion-ready
+              digital experiences for businesses across Uganda &amp; East Africa.
+            </p>
+          </div>
+          <div className="md:col-span-3 rise [animation-delay:.35s]">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-white/45 mb-2">Discipline</div>
+            <div className="font-display text-white text-[22px] leading-tight">
+              Visual craft <span className="text-[#00C8FF]">+</span> System thinking
+            </div>
+          </div>
+          <div className="md:col-span-3 rise [animation-delay:.45s] md:text-right">
+            <a href="#contact" className="inline-flex items-center gap-3 group">
+              <span className="h-12 w-12 rounded-full bg-[#00C8FF] text-[#080c14] flex items-center justify-center text-[18px] group-hover:scale-110 transition-transform">
+                →
+              </span>
+              <span className="font-display text-white text-[22px] leading-none text-left">
+                Start a<br />
+                <span className="italic text-[#00C8FF]">project</span>
+              </span>
             </a>
+          </div>
+        </div>
+
+        <div className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-8 reveal">
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">5+</div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Projects Shipped</div>
+          </div>
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">2–3<span className="text-[#00C8FF]">w</span></div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Delivery</div>
+          </div>
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">100<span className="text-[#00C8FF]">%</span></div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Fixed Scope</div>
+          </div>
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">UG</div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Kampala Based</div>
           </div>
         </div>
       </div>
@@ -368,55 +388,92 @@ function Projects() {
   );
 }
 
-/* ---------------- Services ---------------- */
-function IconLayout() {
+/* ---------------- About ---------------- */
+function About() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <path d="M3 9h18M9 21V9" />
-    </svg>
-  );
-}
-function IconLaptop() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="12" rx="1" />
-      <path d="M2 20h20" />
-    </svg>
-  );
-}
-function IconRocket() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 13a8 8 0 0 1 7-7 13 13 0 0 1 9 9 8 8 0 0 1-7 7l-5-5z" />
-      <circle cx="15" cy="9" r="1.5" />
-      <path d="M7 14l-3 3 3 3 3-3" />
-    </svg>
+    <section id="about" className="px-6 md:px-10 py-28 md:py-40 relative">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 md:gap-16">
+        <div className="md:col-span-7 reveal">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-6">About</div>
+          <h2 className="font-display text-white text-[44px] md:text-[72px] leading-[1.02] tracking-tight">
+            The user is the<br />
+            <span className="italic text-[#00C8FF]">only reality.</span>
+          </h2>
+          <div className="mt-10 space-y-5 text-[15px] md:text-[16px] text-white/75 leading-relaxed max-w-xl">
+            <p>
+              Virello is a Kampala-based web design studio building digital products for
+              businesses across Uganda and East Africa.
+            </p>
+            <p>
+              Our philosophy is simple: complexity belongs in the system, not on the user.
+              Every pixel earns its place. Every interaction has a job. We bridge brand,
+              engineering, and intuition so your site loads fast, looks sharp, and converts.
+            </p>
+          </div>
+        </div>
+
+        <div className="md:col-span-5 reveal" data-delay="120">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-white/55 mb-6">Experience</div>
+          <ul className="divide-y divide-white/10 border-y border-white/10">
+            {[
+              { c: "Virello Studio", r: "Founder · Lead Designer", y: "2024 — Now" },
+              { c: "Client Projects", r: "Web & Product Design", y: "2024 — Now" },
+              { c: "Freelance", r: "UI / Frontend", y: "2022 — 2024" },
+            ].map((e) => (
+              <li key={e.c} className="py-5 flex items-baseline justify-between gap-4">
+                <div>
+                  <div className="font-display text-white text-[20px]">{e.c}</div>
+                  <div className="text-[12px] text-white/55 mt-1">{e.r}</div>
+                </div>
+                <div className="text-[12px] text-white/55 whitespace-nowrap">{e.y}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   );
 }
 
+/* ---------------- Services (numbered) ---------------- */
 const SERVICES = [
-  { icon: <IconLayout />, title: "Web Design", body: "Custom-built websites that reflect your brand and convert visitors." },
-  { icon: <IconRocket />, title: "Digital Presence", body: "Landing pages, product pages, and launch-ready sites shipped fast." },
+  {
+    n: "01",
+    title: "Web Design",
+    body: "Custom-built websites that reflect your brand and turn visitors into customers. Pixel-perfect interfaces, designed mobile-first.",
+  },
+  {
+    n: "02",
+    title: "Digital Presence",
+    body: "Landing pages, product pages, and launch-ready sites shipped in 2–3 weeks. From wireframe to live URL.",
+  },
+  {
+    n: "03",
+    title: "Performance & SEO",
+    body: "Sub-3-second loads, semantic HTML, structured metadata. Built to rank, built to convert.",
+  },
 ];
 
 function Services() {
   return (
-    <section className="px-6 md:px-10 py-24 md:py-32">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="font-display text-white text-[32px] md:text-[40px] mb-12 reveal">
-          What we do
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <section id="services" className="px-6 md:px-10 py-24 md:py-32">
+      <div className="max-w-7xl mx-auto">
+        <div className="reveal mb-14">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-4">Services</div>
+          <h2 className="font-display text-white text-[44px] md:text-[64px] leading-[1.02] tracking-tight">
+            What we <span className="italic text-[#00C8FF]">do.</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10">
           {SERVICES.map((s, i) => (
             <div
               key={s.title}
-              className="glass rounded-2xl p-7 reveal service-card"
+              className="reveal p-8 md:p-10 bg-[#080c14] hover:bg-[#0d1322] transition-colors"
               data-delay={i * 100}
             >
-              <div>{s.icon}</div>
-              <h3 className="font-display text-[22px] text-white mt-5">{s.title}</h3>
-              <p className="text-[13px] text-[#7a8a9a] mt-2 leading-relaxed">{s.body}</p>
+              <div className="font-display text-[#00C8FF] text-[18px] mb-10">{s.n}</div>
+              <h3 className="font-display text-white text-[28px] md:text-[32px] leading-tight">{s.title}</h3>
+              <p className="text-[14px] text-white/65 mt-4 leading-relaxed">{s.body}</p>
             </div>
           ))}
         </div>
@@ -428,21 +485,46 @@ function Services() {
 /* ---------------- Contact ---------------- */
 function Contact() {
   return (
-    <section className="px-6 md:px-10 py-28 md:py-36" style={{ background: "#0d1322" }}>
-      <div className="max-w-[560px] mx-auto glass rounded-2xl p-10 md:p-14 text-center reveal">
-        <h2 className="font-display italic text-white text-[40px] md:text-[52px] leading-tight">
-          Let's build something.
-        </h2>
-        <p className="mt-5 text-[15px] text-[#7a8a9a] leading-relaxed">
-          Based in Kampala. Building for East Africa and beyond. Reach out and let's talk about your
-          project.
-        </p>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="font-display text-[#00C8FF] text-[20px] md:text-[24px] mt-8 inline-block hover:underline break-all"
-        >
-          {EMAIL}
-        </a>
+    <section id="contact" className="px-6 md:px-10 py-28 md:py-36" style={{ background: "#0d1322" }}>
+      <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-14 md:gap-20">
+        <div className="md:col-span-6 reveal">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-6">Contact</div>
+          <h2 className="font-display text-white text-[48px] md:text-[80px] leading-[0.98] tracking-tight">
+            Ready to<br />
+            start the<br />
+            <span className="italic text-[#00C8FF]">project?</span>
+          </h2>
+          <p className="mt-8 text-[15px] text-white/65 max-w-md leading-relaxed">
+            Currently accepting new projects. Tell us about yours — we reply within one
+            business day, usually faster.
+          </p>
+        </div>
+        <div className="md:col-span-6 reveal" data-delay="120">
+          <div className="space-y-10">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-white/55 mb-3">Email</div>
+              <a
+                href={`mailto:${EMAIL}`}
+                className="font-display text-white text-[22px] md:text-[28px] hover:text-[#00C8FF] transition-colors break-all"
+              >
+                {EMAIL}
+              </a>
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-white/55 mb-3">Studio</div>
+              <div className="text-white/85 text-[16px]">Kampala, Uganda</div>
+              <div className="text-white/55 text-[13px] mt-1">Working remotely across East Africa</div>
+            </div>
+            <div>
+              <a href={MAILTO} className="inline-flex items-center gap-3 group">
+                <span className="h-14 w-14 rounded-full bg-[#00C8FF] text-[#080c14] flex items-center justify-center text-[20px] group-hover:scale-110 transition-transform">
+                  →
+                </span>
+                <span className="font-display text-white text-[24px]">Send a brief</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -698,6 +780,7 @@ function Index() {
         <Hero />
         <Process />
         <Projects />
+        <About />
         <Pricing />
         <StickyCTA />
         <Services />
