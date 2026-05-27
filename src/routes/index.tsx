@@ -780,6 +780,7 @@ function Index() {
         <Hero />
         <Process />
         <Projects />
+        <About />
         <Pricing />
         <StickyCTA />
         <Services />
