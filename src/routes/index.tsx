@@ -485,21 +485,46 @@ function Services() {
 /* ---------------- Contact ---------------- */
 function Contact() {
   return (
-    <section className="px-6 md:px-10 py-28 md:py-36" style={{ background: "#0d1322" }}>
-      <div className="max-w-[560px] mx-auto glass rounded-2xl p-10 md:p-14 text-center reveal">
-        <h2 className="font-display italic text-white text-[40px] md:text-[52px] leading-tight">
-          Let's build something.
-        </h2>
-        <p className="mt-5 text-[15px] text-[#7a8a9a] leading-relaxed">
-          Based in Kampala. Building for East Africa and beyond. Reach out and let's talk about your
-          project.
-        </p>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="font-display text-[#00C8FF] text-[20px] md:text-[24px] mt-8 inline-block hover:underline break-all"
-        >
-          {EMAIL}
-        </a>
+    <section id="contact" className="px-6 md:px-10 py-28 md:py-36" style={{ background: "#0d1322" }}>
+      <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-14 md:gap-20">
+        <div className="md:col-span-6 reveal">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-6">Contact</div>
+          <h2 className="font-display text-white text-[48px] md:text-[80px] leading-[0.98] tracking-tight">
+            Ready to<br />
+            start the<br />
+            <span className="italic text-[#00C8FF]">project?</span>
+          </h2>
+          <p className="mt-8 text-[15px] text-white/65 max-w-md leading-relaxed">
+            Currently accepting new projects. Tell us about yours — we reply within one
+            business day, usually faster.
+          </p>
+        </div>
+        <div className="md:col-span-6 reveal" data-delay="120">
+          <div className="space-y-10">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-white/55 mb-3">Email</div>
+              <a
+                href={`mailto:${EMAIL}`}
+                className="font-display text-white text-[22px] md:text-[28px] hover:text-[#00C8FF] transition-colors break-all"
+              >
+                {EMAIL}
+              </a>
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-white/55 mb-3">Studio</div>
+              <div className="text-white/85 text-[16px]">Kampala, Uganda</div>
+              <div className="text-white/55 text-[13px] mt-1">Working remotely across East Africa</div>
+            </div>
+            <div>
+              <a href={MAILTO} className="inline-flex items-center gap-3 group">
+                <span className="h-14 w-14 rounded-full bg-[#00C8FF] text-[#080c14] flex items-center justify-center text-[20px] group-hover:scale-110 transition-transform">
+                  →
+                </span>
+                <span className="font-display text-white text-[24px]">Send a brief</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
