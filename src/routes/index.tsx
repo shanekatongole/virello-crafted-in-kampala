@@ -388,55 +388,92 @@ function Projects() {
   );
 }
 
-/* ---------------- Services ---------------- */
-function IconLayout() {
+/* ---------------- About ---------------- */
+function About() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <path d="M3 9h18M9 21V9" />
-    </svg>
-  );
-}
-function IconLaptop() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="12" rx="1" />
-      <path d="M2 20h20" />
-    </svg>
-  );
-}
-function IconRocket() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00C8FF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 13a8 8 0 0 1 7-7 13 13 0 0 1 9 9 8 8 0 0 1-7 7l-5-5z" />
-      <circle cx="15" cy="9" r="1.5" />
-      <path d="M7 14l-3 3 3 3 3-3" />
-    </svg>
+    <section id="about" className="px-6 md:px-10 py-28 md:py-40 relative">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 md:gap-16">
+        <div className="md:col-span-7 reveal">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-6">About</div>
+          <h2 className="font-display text-white text-[44px] md:text-[72px] leading-[1.02] tracking-tight">
+            The user is the<br />
+            <span className="italic text-[#00C8FF]">only reality.</span>
+          </h2>
+          <div className="mt-10 space-y-5 text-[15px] md:text-[16px] text-white/75 leading-relaxed max-w-xl">
+            <p>
+              Virello is a Kampala-based web design studio building digital products for
+              businesses across Uganda and East Africa.
+            </p>
+            <p>
+              Our philosophy is simple: complexity belongs in the system, not on the user.
+              Every pixel earns its place. Every interaction has a job. We bridge brand,
+              engineering, and intuition so your site loads fast, looks sharp, and converts.
+            </p>
+          </div>
+        </div>
+
+        <div className="md:col-span-5 reveal" data-delay="120">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-white/55 mb-6">Experience</div>
+          <ul className="divide-y divide-white/10 border-y border-white/10">
+            {[
+              { c: "Virello Studio", r: "Founder · Lead Designer", y: "2024 — Now" },
+              { c: "Client Projects", r: "Web & Product Design", y: "2024 — Now" },
+              { c: "Freelance", r: "UI / Frontend", y: "2022 — 2024" },
+            ].map((e) => (
+              <li key={e.c} className="py-5 flex items-baseline justify-between gap-4">
+                <div>
+                  <div className="font-display text-white text-[20px]">{e.c}</div>
+                  <div className="text-[12px] text-white/55 mt-1">{e.r}</div>
+                </div>
+                <div className="text-[12px] text-white/55 whitespace-nowrap">{e.y}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
   );
 }
 
+/* ---------------- Services (numbered) ---------------- */
 const SERVICES = [
-  { icon: <IconLayout />, title: "Web Design", body: "Custom-built websites that reflect your brand and convert visitors." },
-  { icon: <IconRocket />, title: "Digital Presence", body: "Landing pages, product pages, and launch-ready sites shipped fast." },
+  {
+    n: "01",
+    title: "Web Design",
+    body: "Custom-built websites that reflect your brand and turn visitors into customers. Pixel-perfect interfaces, designed mobile-first.",
+  },
+  {
+    n: "02",
+    title: "Digital Presence",
+    body: "Landing pages, product pages, and launch-ready sites shipped in 2–3 weeks. From wireframe to live URL.",
+  },
+  {
+    n: "03",
+    title: "Performance & SEO",
+    body: "Sub-3-second loads, semantic HTML, structured metadata. Built to rank, built to convert.",
+  },
 ];
 
 function Services() {
   return (
-    <section className="px-6 md:px-10 py-24 md:py-32">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="font-display text-white text-[32px] md:text-[40px] mb-12 reveal">
-          What we do
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <section id="services" className="px-6 md:px-10 py-24 md:py-32">
+      <div className="max-w-7xl mx-auto">
+        <div className="reveal mb-14">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-4">Services</div>
+          <h2 className="font-display text-white text-[44px] md:text-[64px] leading-[1.02] tracking-tight">
+            What we <span className="italic text-[#00C8FF]">do.</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10">
           {SERVICES.map((s, i) => (
             <div
               key={s.title}
-              className="glass rounded-2xl p-7 reveal service-card"
+              className="reveal p-8 md:p-10 bg-[#080c14] hover:bg-[#0d1322] transition-colors"
               data-delay={i * 100}
             >
-              <div>{s.icon}</div>
-              <h3 className="font-display text-[22px] text-white mt-5">{s.title}</h3>
-              <p className="text-[13px] text-[#7a8a9a] mt-2 leading-relaxed">{s.body}</p>
+              <div className="font-display text-[#00C8FF] text-[18px] mb-10">{s.n}</div>
+              <h3 className="font-display text-white text-[28px] md:text-[32px] leading-tight">{s.title}</h3>
+              <p className="text-[14px] text-white/65 mt-4 leading-relaxed">{s.body}</p>
             </div>
           ))}
         </div>
