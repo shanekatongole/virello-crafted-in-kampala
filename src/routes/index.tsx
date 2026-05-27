@@ -155,56 +155,70 @@ function Hero() {
   return (
     <section
       id="top"
-      className="relative min-h-screen flex items-center px-6 md:px-10 overflow-hidden"
+      className="relative min-h-screen px-6 md:px-10 overflow-hidden pt-28 pb-16"
     >
       <div className="noise-overlay" />
-      {/* Right-side decorative grid */}
-      <svg
-        aria-hidden
-        className="absolute right-0 top-0 h-full w-1/2 pointer-events-none hidden md:block"
-        style={{ opacity: 0.06 }}
-        viewBox="0 0 600 800"
-        preserveAspectRatio="xMaxYMid slice"
-      >
-        <defs>
-          <pattern id="dotgrid" width="28" height="28" patternUnits="userSpaceOnUse">
-            <circle cx="1.5" cy="1.5" r="1.5" fill="#00C8FF" />
-          </pattern>
-        </defs>
-        <rect width="600" height="800" fill="url(#dotgrid)" />
-        <rect x="120" y="120" width="320" height="120" fill="none" stroke="#00C8FF" strokeWidth="1" />
-        <rect x="200" y="220" width="280" height="180" fill="none" stroke="#00C8FF" strokeWidth="1" />
-        <rect x="80" y="360" width="360" height="160" fill="none" stroke="#00C8FF" strokeWidth="1" />
-      </svg>
-
-      <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-12 gap-10 items-center pt-32 pb-24">
-        <div className="md:col-span-8">
-          <h1 className="font-display text-white leading-[1.02] tracking-tight text-[42px] md:text-[72px]">
-            <span className="block rise">Digital products</span>
-            <span className="block rise [animation-delay:.1s]">crafted for</span>
-            <span className="block italic text-[#00C8FF] rise [animation-delay:.2s]">
-              East Africa.
+      <div className="relative max-w-7xl mx-auto w-full">
+        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-white/55 rise">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-[#00C8FF] opacity-60 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00C8FF]" />
             </span>
-          </h1>
-          <p className="mt-8 max-w-xl text-[16px] text-[#7a8a9a] leading-relaxed rise [animation-delay:.35s]">
-            Virello is a web design studio building websites and digital products for businesses
-            across Uganda and East Africa. We turn ideas into fast, polished, conversion-ready
-            experiences.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#7a8a9a] rise [animation-delay:.45s]">
-            <span>5 projects live</span>
-            <span className="text-[#00C8FF]">·</span>
-            <span>2–3 week delivery</span>
-            <span className="text-[#00C8FF]">·</span>
-            <span>Kampala-based</span>
+            <span className="text-[#00C8FF]">Online</span>
           </div>
-          <div className="mt-12 rise [animation-delay:.55s]">
-            <a
-              href="#work"
-              className="inline-block border border-[#00C8FF] text-[#00C8FF] px-7 py-3 text-[14px] font-medium hover:bg-[rgba(0,200,255,0.1)] transition-colors"
-            >
-              See our work
+          <div>Est. 2024 — Kampala, UG</div>
+        </div>
+
+        <div className="mt-10 md:mt-14">
+          <h1 className="font-display text-white leading-[0.92] tracking-[-0.02em] text-[68px] sm:text-[110px] md:text-[150px] lg:text-[180px]">
+            <span className="block rise">Virello</span>
+            <span className="block italic text-[#00C8FF] rise [animation-delay:.1s]">Studio.</span>
+          </h1>
+        </div>
+
+        <div className="mt-12 md:mt-16 grid md:grid-cols-12 gap-10 items-end">
+          <div className="md:col-span-6 rise [animation-delay:.25s]">
+            <p className="text-[16px] md:text-[18px] text-white/75 leading-relaxed max-w-xl">
+              A web design studio crafting fast, polished, conversion-ready
+              digital experiences for businesses across Uganda &amp; East Africa.
+            </p>
+          </div>
+          <div className="md:col-span-3 rise [animation-delay:.35s]">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-white/45 mb-2">Discipline</div>
+            <div className="font-display text-white text-[22px] leading-tight">
+              Visual craft <span className="text-[#00C8FF]">+</span> System thinking
+            </div>
+          </div>
+          <div className="md:col-span-3 rise [animation-delay:.45s] md:text-right">
+            <a href="#contact" className="inline-flex items-center gap-3 group">
+              <span className="h-12 w-12 rounded-full bg-[#00C8FF] text-[#080c14] flex items-center justify-center text-[18px] group-hover:scale-110 transition-transform">
+                →
+              </span>
+              <span className="font-display text-white text-[22px] leading-none text-left">
+                Start a<br />
+                <span className="italic text-[#00C8FF]">project</span>
+              </span>
             </a>
+          </div>
+        </div>
+
+        <div className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-white/10 pt-8 reveal">
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">5+</div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Projects Shipped</div>
+          </div>
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">2–3<span className="text-[#00C8FF]">w</span></div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Delivery</div>
+          </div>
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">100<span className="text-[#00C8FF]">%</span></div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Fixed Scope</div>
+          </div>
+          <div>
+            <div className="font-display text-white text-[40px] leading-none">UG</div>
+            <div className="text-[12px] text-white/55 mt-2 uppercase tracking-[0.15em]">Kampala Based</div>
           </div>
         </div>
       </div>
