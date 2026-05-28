@@ -1,199 +1,253 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { PROJECTS } from "@/lib/projects";
 import { ProjectPreview } from "@/components/ProjectPreview";
-import { STUDIO_EMAIL, mailtoSubject, PRICING, formatUGX, STARTING_PRICE_DISPLAY } from "@/lib/constants";
+import {
+  STUDIO_EMAIL,
+  mailtoSubject,
+  PRICING,
+  formatUGX,
+  STARTING_PRICE_DISPLAY,
+} from "@/lib/constants";
 
 export const Route = createFileRoute("/")({ component: Index });
 
-const EMAIL = STUDIO_EMAIL;
-const MAILTO = mailtoSubject("New project enquiry");
-
-const BLUE = "#00c2ff";
-const BLUE2 = "#0057ff";
+const B1 = "#00c2ff";
+const B2 = "#0057ff";
 const BG = "#050505";
-const PANEL = "#080810";
+const PANEL = "#09090f";
+const MAILTO = mailtoSubject("New project enquiry");
+const EMAIL = STUDIO_EMAIL;
+
+/* ─── SVG liquid-glass filter (injected once, referenced by id) ─── */
+function LiquidFilter() {
+  return (
+    <svg
+      aria-hidden
+      style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
+    >
+      <defs>
+        <filter
+          id="liq"
+          x="-30%"
+          y="-30%"
+          width="160%"
+          height="160%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.008 0.007"
+            numOctaves="4"
+            seed="11"
+            result="noise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              values="0.008 0.007;0.013 0.009;0.007 0.012;0.011 0.006;0.008 0.007"
+              dur="32s"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale="55"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
 
 /* ─── Custom cursor ─── */
 function useCustomCursor() {
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    if (isTouch) return;
-
-    const dot = document.createElement("div");
-    const ring = document.createElement("div");
-    dot.style.cssText = `position:fixed;top:0;left:0;width:6px;height:6px;border-radius:50%;background:${BLUE};pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .15s ease,opacity .15s ease;box-shadow:0 0 8px ${BLUE};`;
-    ring.style.cssText = `position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;border:1.5px solid ${BLUE};pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s ease,height .25s ease,opacity .25s ease,border-color .25s ease;box-shadow:0 0 16px rgba(0,194,255,0.3);`;
-    document.body.appendChild(dot);
-    document.body.appendChild(ring);
-    document.documentElement.classList.add("has-custom-cursor");
-
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return;
+    const dot = Object.assign(document.createElement("div"), {});
+    const ring = Object.assign(document.createElement("div"), {});
+    dot.style.cssText = `position:fixed;top:0;left:0;width:6px;height:6px;border-radius:50%;background:${B1};pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px ${B1};`;
+    ring.style.cssText = `position:fixed;top:0;left:0;width:38px;height:38px;border-radius:50%;border:1.5px solid ${B1};pointer-events:none;z-index:9998;transform:translate(-50%,-50%);box-shadow:0 0 20px rgba(0,194,255,0.25);transition:width .25s,height .25s,border-color .25s,opacity .25s;`;
+    document.body.append(dot, ring);
+    document.documentElement.classList.add("no-cursor");
+    let mx = innerWidth / 2, my = innerHeight / 2;
     let rx = mx, ry = my;
-    let hovering = false;
     let raf = 0;
-
     const onMove = (e: MouseEvent) => {
       mx = e.clientX; my = e.clientY;
       dot.style.left = mx + "px"; dot.style.top = my + "px";
+      const t = e.target as HTMLElement | null;
+      const h = !!(t?.closest("a,button,[data-hover]"));
+      dot.style.transform = `translate(-50%,-50%) scale(${h ? 0 : 1})`;
+      ring.style.width = h ? "52px" : "38px";
+      ring.style.height = h ? "52px" : "38px";
     };
     const loop = () => {
-      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
+      rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
       ring.style.left = rx + "px"; ring.style.top = ry + "px";
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-
-    const setHover = (on: boolean) => {
-      if (on === hovering) return;
-      hovering = on;
-      if (on) {
-        dot.style.transform = "translate(-50%,-50%) scale(0)";
-        ring.style.width = "52px"; ring.style.height = "52px";
-        ring.style.borderColor = BLUE; ring.style.opacity = "0.6";
-      } else {
-        dot.style.transform = "translate(-50%,-50%) scale(1)";
-        ring.style.width = "36px"; ring.style.height = "36px";
-        ring.style.opacity = "1";
-      }
-    };
-    const onOver = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t?.closest("[data-cursor='hide']")) { dot.style.opacity = "0"; ring.style.opacity = "0"; return; }
-      dot.style.opacity = "1";
-      setHover(!!(t?.closest("a,button,[data-cursor='hover']")));
-    };
     window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseover", onOver);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseover", onOver);
       dot.remove(); ring.remove();
-      document.documentElement.classList.remove("has-custom-cursor");
+      document.documentElement.classList.remove("no-cursor");
     };
   }, []);
 }
 
-/* ─── Reveal on scroll ─── */
+/* ─── Mouse parallax via CSS vars ─── */
+function useParallax() {
+  useEffect(() => {
+    let raf = 0;
+    const onMove = (e: MouseEvent) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const x = (e.clientX / innerWidth - 0.5).toFixed(4);
+        const y = (e.clientY / innerHeight - 0.5).toFixed(4);
+        document.documentElement.style.setProperty("--px", x);
+        document.documentElement.style.setProperty("--py", y);
+      });
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+}
+
+/* ─── Scroll reveal ─── */
 function useReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(".reveal");
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            const el = e.target as HTMLElement;
-            el.style.transitionDelay = `${el.dataset.delay || "0"}ms`;
-            el.classList.add("is-visible");
-            io.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.12 },
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          const el = e.target as HTMLElement;
+          el.style.transitionDelay = `${el.dataset.d || 0}ms`;
+          el.classList.add("vis");
+          io.unobserve(el);
+        }
+      }),
+      { threshold: 0.1 },
     );
-    els.forEach((el) => io.observe(el));
+    document.querySelectorAll(".rv").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
 }
 
-/* ─── Fluid orb background ─── */
-function FluidBg({ style }: { style?: React.CSSProperties }) {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" style={style}>
-      <div className="fluid-orb fluid-orb-1" style={{ top: "-15%", left: "-10%" }} />
-      <div className="fluid-orb fluid-orb-2" style={{ top: "30%", right: "-8%" }} />
-      <div className="fluid-orb fluid-orb-3" style={{ bottom: "10%", left: "35%" }} />
-    </div>
-  );
-}
-
-/* ─── Nav ─── */
+/* ─── Floating pill nav ─── */
 function Nav() {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
-    const onScroll = () => {
-      if (!ref.current) return;
-      if (window.scrollY > 24) ref.current.classList.add("is-scrolled");
-      else ref.current.classList.remove("is-scrolled");
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const fn = () => ref.current?.classList.toggle("scrolled", scrollY > 30);
+    addEventListener("scroll", fn, { passive: true });
+    return () => removeEventListener("scroll", fn);
+  }, []);
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    addEventListener("keydown", fn);
+    return () => removeEventListener("keydown", fn);
   }, []);
 
+  const links = [["#work","Work"],["#about","About"],["#services","Services"],["#pricing","Pricing"],["#contact","Contact"]];
+
   return (
-    <header
-      ref={ref}
-      className="fixed top-0 inset-x-0 z-40 rise [animation-delay:.2s]"
-      style={{ transition: "background 0.3s ease, backdrop-filter 0.3s ease" }}
-    >
-      <style>{`
-        header.is-scrolled {
-          background: rgba(5,5,5,0.82);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-      `}</style>
-      <div className="max-w-7xl mx-auto px-6 md:px-10 h-[68px] flex items-center justify-between">
-        <a href="#top" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontSize: 20, color: "#f0f4ff", letterSpacing: "-0.04em", textDecoration: "none" }}>
-          Virello<span style={{ color: BLUE }}>.</span>
+    <>
+      <div ref={ref} className="nav-pill en" style={{ animationDelay: ".15s" }}>
+        {/* Logo */}
+        <a href="#top" style={{ fontFamily: '"Plus Jakarta Sans",sans-serif', fontWeight: 800, fontSize: 19, color: "#f0f4ff", letterSpacing: "-0.045em", textDecoration: "none", flexShrink: 0 }}>
+          Virello<span style={{ color: B1 }}>.</span>
         </a>
-        <nav className="hidden md:flex items-center gap-8" style={{ fontSize: 13, fontWeight: 500 }}>
-          {[["#work","Work"],["#about","About"],["#pricing","Pricing"],["#contact","Contact"]].map(([href, label]) => (
-            <a key={href} href={href} style={{ color: "rgba(240,244,255,0.6)", textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(240,244,255,0.6)")}
+
+        {/* Desktop nav links */}
+        <nav className="hidden md:flex items-center gap-6" style={{ fontSize: 13, fontWeight: 500 }}>
+          {links.map(([href, label]) => (
+            <a key={href} href={href} style={{ color: "rgba(240,244,255,0.5)", textDecoration: "none", transition: "color .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#f0f4ff")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(240,244,255,0.5)")}
             >{label}</a>
           ))}
         </nav>
-        <a
-          href={`mailto:${EMAIL}`}
-          style={{
-            fontSize: 13, fontWeight: 700, padding: "9px 22px", borderRadius: 999,
-            background: "linear-gradient(135deg, #00c2ff, #0057ff)",
-            color: "#050505", textDecoration: "none", letterSpacing: "-0.01em",
-            boxShadow: "0 0 24px rgba(0,87,255,0.35)",
-            transition: "box-shadow 0.25s ease, opacity 0.25s ease",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 0 40px rgba(0,87,255,0.55)")}
-          onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 0 24px rgba(0,87,255,0.35)")}
-        >
-          Get in touch
-        </a>
+
+        {/* CTA + hamburger */}
+        <div className="flex items-center gap-3">
+          <a href={`mailto:${EMAIL}`} data-hover className="hidden sm:block"
+            style={{ fontSize: 12, fontWeight: 700, padding: "8px 18px", borderRadius: 999,
+              background: `linear-gradient(135deg,${B1},${B2})`,
+              color: "#050505", textDecoration: "none", letterSpacing: "-0.01em",
+              boxShadow: `0 0 24px rgba(0,87,255,0.3)`,
+              transition: "box-shadow .25s ease, opacity .2s ease",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 40px rgba(0,87,255,0.55)`)}
+            onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 24px rgba(0,87,255,0.3)`)}
+          >
+            Get in touch
+          </a>
+          <button
+            data-hover onClick={() => setOpen(!open)}
+            className="md:hidden flex flex-col gap-1.5 p-2"
+            style={{ background: "none", border: "none", cursor: "none" }}
+            aria-label="Toggle menu"
+          >
+            <span style={{ display: "block", width: 22, height: 1.5, background: "#f0f4ff", borderRadius: 2, transition: "transform .3s, opacity .3s", transform: open ? "translateY(5.5px) rotate(45deg)" : "none" }} />
+            <span style={{ display: "block", width: 22, height: 1.5, background: "#f0f4ff", borderRadius: 2, transition: "opacity .3s", opacity: open ? 0 : 1 }} />
+            <span style={{ display: "block", width: 22, height: 1.5, background: "#f0f4ff", borderRadius: 2, transition: "transform .3s, opacity .3s", transform: open ? "translateY(-5.5px) rotate(-45deg)" : "none" }} />
+          </button>
+        </div>
       </div>
-    </header>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="mob-menu md:hidden fixed inset-x-4 z-50"
+          style={{ top: 90, borderRadius: 16, padding: "12px 8px",
+            background: "rgba(9,9,15,0.92)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            backdropFilter: "blur(28px)",
+            WebkitBackdropFilter: "blur(28px)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+          }}
+        >
+          {links.map(([href, label]) => (
+            <a key={href} href={href} onClick={() => setOpen(false)}
+              style={{ display: "block", padding: "14px 20px", fontSize: 18, fontWeight: 700,
+                color: "#f0f4ff", textDecoration: "none", letterSpacing: "-0.02em",
+                borderRadius: 10, transition: "background .2s, color .2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,194,255,0.08)"; e.currentTarget.style.color = B1; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#f0f4ff"; }}
+            >{label}</a>
+          ))}
+          <div style={{ padding: "8px 12px 4px" }}>
+            <a href={`mailto:${EMAIL}`} onClick={() => setOpen(false)}
+              style={{ display: "block", textAlign: "center", padding: "13px",
+                borderRadius: 10, background: `linear-gradient(135deg,${B1},${B2})`,
+                color: "#050505", fontWeight: 800, fontSize: 14, textDecoration: "none",
+              }}
+            >Get in touch →</a>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
-/* ─── Floating Data Card ─── */
-function DataCard({ label, value, accent, floatClass, style }: {
-  label: string; value: string; accent?: string; floatClass?: string; style?: React.CSSProperties;
-}) {
-  const color = accent || BLUE;
+/* ─── Floating data pill ─── */
+function Pill({ value, label, flt, style }: { value: string; label: string; flt?: string; style?: React.CSSProperties }) {
   return (
-    <div
-      className={floatClass}
-      style={{
-        background: "rgba(8,8,16,0.75)",
-        border: `1px solid rgba(0,194,255,0.18)`,
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        borderRadius: 16,
-        padding: "14px 20px",
-        boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,194,255,0.08), inset 0 1px 0 rgba(255,255,255,0.07)`,
-        minWidth: 120,
-        ...style,
-      }}
-    >
-      <div style={{ fontSize: 22, fontWeight: 800, color, letterSpacing: "-0.04em", lineHeight: 1, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
-        {value}
-      </div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(240,244,255,0.45)", textTransform: "uppercase", letterSpacing: "0.14em", marginTop: 5 }}>
-        {label}
-      </div>
+    <div className={flt} style={{
+      background: "rgba(9,9,15,0.78)",
+      border: "1px solid rgba(0,194,255,0.18)",
+      backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+      borderRadius: 14, padding: "14px 20px",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,194,255,0.06), inset 0 1px 0 rgba(255,255,255,0.07)",
+      ...style,
+    }}>
+      <div style={{ fontWeight: 800, fontSize: 24, color: B1, letterSpacing: "-0.04em", lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.16em", color: "rgba(240,244,255,0.4)", marginTop: 5 }}>{label}</div>
     </div>
   );
 }
@@ -201,263 +255,284 @@ function DataCard({ label, value, accent, floatClass, style }: {
 /* ─── Hero ─── */
 function Hero() {
   return (
-    <section id="top" className="relative min-h-screen px-6 md:px-10 overflow-hidden pt-32 pb-20" style={{ background: BG }}>
-      <div className="noise-overlay" />
-      <FluidBg />
+    <section id="top" style={{ position: "relative", minHeight: "100svh", overflow: "hidden", background: BG, display: "flex", flexDirection: "column", justifyContent: "flex-end", paddingBottom: "clamp(48px, 8vw, 96px)" }}>
+      {/* Liquid filter def */}
+      <LiquidFilter />
 
-      <div className="relative max-w-7xl mx-auto w-full" style={{ zIndex: 2 }}>
-        {/* Status bar */}
-        <div className="flex items-center justify-between rise" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.4)" }}>
-          <div className="flex items-center gap-2.5">
-            <span className="relative flex h-2 w-2">
-              <span className="beacon-ping absolute inline-flex h-full w-full rounded-full" style={{ background: BLUE, opacity: 0.7 }} />
-              <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: BLUE, boxShadow: `0 0 8px ${BLUE}` }} />
+      {/* Liquid glass shapes — filtered for real distortion */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        <div style={{ filter: "url(#liq)", position: "absolute", inset: 0, zIndex: 0 }}>
+          <div className="lq-shape lq-a p-s" />
+          <div className="lq-shape lq-b p-m" />
+          <div className="lq-shape lq-c p-f" />
+        </div>
+        {/* Soft glow beneath shapes, not filtered */}
+        <div className="p-f" style={{ position: "absolute", top: "5%", left: "5%", width: "45vw", height: "45vw", maxWidth: 600, maxHeight: 600,
+          background: `radial-gradient(ellipse at 50% 50%, rgba(0,87,255,0.12) 0%, transparent 65%)`,
+          filter: "blur(60px)", pointerEvents: "none" }} />
+        <div className="p-m" style={{ position: "absolute", top: "20%", right: "0%", width: "35vw", height: "35vw", maxWidth: 480, maxHeight: 480,
+          background: `radial-gradient(ellipse at 50% 50%, rgba(0,194,255,0.1) 0%, transparent 65%)`,
+          filter: "blur(60px)", pointerEvents: "none" }} />
+      </div>
+
+      {/* Content */}
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 1280, margin: "0 auto", width: "100%", padding: "0 clamp(20px, 5vw, 60px)", paddingTop: "clamp(110px, 18vh, 160px)" }}>
+
+        {/* Top meta row */}
+        <div className="en" style={{ animationDelay: ".3s", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "clamp(40px, 7vw, 72px)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.38)" }}>
+          <span className="flex items-center gap-2.5">
+            <span className="relative flex h-2 w-2 flex-shrink-0">
+              <span className="beacon-ring absolute inline-flex h-full w-full rounded-full" style={{ background: B1, opacity: 0.7 }} />
+              <span className="relative h-2 w-2 rounded-full" style={{ background: B1, boxShadow: `0 0 8px ${B1}`, display: "inline-flex" }} />
             </span>
-            <span style={{ color: BLUE }}>Available for projects</span>
-          </div>
-          <span>Est. 2024 — Kampala, UG</span>
+            <span style={{ color: B1 }}>Available · Starting from {STARTING_PRICE_DISPLAY}</span>
+          </span>
+          <span className="hidden sm:block">Est. 2024 · Kampala, UG</span>
         </div>
 
         {/* Headline */}
-        <div className="mt-12 md:mt-16 relative">
-          <h1 style={{
-            fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800,
-            lineHeight: 0.9, letterSpacing: "-0.04em",
-            fontSize: "clamp(72px, 13vw, 180px)", color: "#f0f4ff",
-          }}>
-            <span className="block rise">Virello</span>
-            <span className="block rise gradient-text [animation-delay:.08s]" style={{ fontStyle: "italic" }}>
-              Studio.
-            </span>
-          </h1>
-
-          {/* Floating data cards — desktop only */}
-          <div className="hidden lg:block">
-            <div className="float-a absolute" style={{ top: "8%", right: "2%" }}>
-              <DataCard value="5+" label="Projects Shipped" accent={BLUE} />
-            </div>
-            <div className="float-b absolute" style={{ top: "52%", right: "12%" }}>
-              <DataCard value="2–3w" label="Avg Delivery" accent={BLUE2} />
-            </div>
-            <div className="float-c absolute" style={{ bottom: "-10%", right: "28%" }}>
-              <DataCard value="100%" label="Fixed Scope" accent={BLUE} />
-            </div>
+        <h1 style={{ fontWeight: 800, letterSpacing: "-0.045em", lineHeight: 0.88, margin: 0, fontFamily: '"Plus Jakarta Sans",sans-serif' }}>
+          <div className="clip-line en" style={{ animationDelay: ".38s" }}>
+            <span className="inner" style={{ display: "block", fontSize: "clamp(64px, 13.5vw, 196px)", color: "#f0f4ff" }}>We design</span>
           </div>
-        </div>
+          <div className="clip-line en" style={{ animationDelay: ".48s" }}>
+            <span className="inner g-text" style={{ display: "block", fontSize: "clamp(64px, 13.5vw, 196px)", fontStyle: "italic" }}>digital</span>
+          </div>
+          <div className="clip-line en" style={{ animationDelay: ".56s" }}>
+            <span className="inner" style={{ display: "block", fontSize: "clamp(64px, 13.5vw, 196px)", color: "#f0f4ff" }}>futures.</span>
+          </div>
+        </h1>
 
-        {/* Sub-row */}
-        <div className="mt-14 md:mt-20 grid md:grid-cols-12 gap-10 items-end">
-          <div className="md:col-span-6 rise [animation-delay:.22s]">
-            <p style={{ fontSize: "clamp(15px, 1.8vw, 18px)", color: "rgba(240,244,255,0.7)", lineHeight: 1.7, maxWidth: 520, fontWeight: 400 }}>
-              A web design studio crafting fast, polished, conversion-ready
-              digital experiences for businesses across Uganda & East Africa.
+        {/* Bottom row */}
+        <div className="grid md:grid-cols-3 gap-8 md:gap-12" style={{ marginTop: "clamp(36px, 6vw, 64px)" }}>
+          <div className="md:col-span-1 en" style={{ animationDelay: ".68s" }}>
+            <p style={{ fontSize: "clamp(14px, 1.5vw, 16px)", color: "rgba(240,244,255,0.6)", lineHeight: 1.75, margin: 0 }}>
+              A Kampala-based web design studio crafting fast, polished digital experiences for businesses across East Africa.
             </p>
           </div>
-          <div className="md:col-span-3 rise [animation-delay:.32s]">
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.35)", marginBottom: 8 }}>Discipline</div>
-            <div style={{ fontWeight: 700, fontSize: 18, color: "#f0f4ff", lineHeight: 1.4, letterSpacing: "-0.02em" }}>
-              Visual craft <span style={{ color: BLUE }}>+</span> System thinking
+          <div className="md:col-span-1 hidden md:flex items-end justify-center en" style={{ animationDelay: ".72s" }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+              <Pill value="5+" label="Projects shipped" flt="flt-a" />
+              <Pill value="2–3w" label="Delivery" flt="flt-b" />
             </div>
           </div>
-          <div className="md:col-span-3 rise [animation-delay:.42s] md:text-right">
-            <a href="#contact" className="inline-flex items-center gap-3 group">
-              <span
-                style={{
-                  height: 52, width: 52, borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${BLUE}, ${BLUE2})`,
+          <div className="md:col-span-1 flex md:justify-end items-end en" style={{ animationDelay: ".78s" }}>
+            <div>
+              <a href={MAILTO} data-hover
+                style={{ display: "inline-flex", alignItems: "center", gap: 14, textDecoration: "none" }}
+                onMouseEnter={e => { const b = e.currentTarget.querySelector<HTMLElement>(".cta-circle"); if (b) { b.style.transform = "scale(1.12)"; b.style.boxShadow = `0 0 56px rgba(0,87,255,0.65)`; } }}
+                onMouseLeave={e => { const b = e.currentTarget.querySelector<HTMLElement>(".cta-circle"); if (b) { b.style.transform = "scale(1)"; b.style.boxShadow = `0 0 36px rgba(0,87,255,0.4)`; } }}
+              >
+                <span className="cta-circle" style={{ width: 58, height: 58, borderRadius: "50%",
+                  background: `linear-gradient(135deg,${B1},${B2})`,
                   color: "#050505", display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 20, fontWeight: 800, boxShadow: `0 0 32px rgba(0,87,255,0.45)`,
-                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.12)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 0 48px rgba(0,87,255,0.65)`; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 0 32px rgba(0,87,255,0.45)`; }}
-              >→</span>
-              <span style={{ fontWeight: 800, fontSize: 20, color: "#f0f4ff", lineHeight: 1.2, textAlign: "left", letterSpacing: "-0.03em" }}>
-                Start a<br /><span className="gradient-text" style={{ fontStyle: "italic" }}>project</span>
-              </span>
-            </a>
+                  fontSize: 22, fontWeight: 800, boxShadow: `0 0 36px rgba(0,87,255,0.4)`,
+                  transition: "transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease", flexShrink: 0,
+                }}>→</span>
+                <span style={{ fontWeight: 800, fontSize: "clamp(18px, 2vw, 22px)", color: "#f0f4ff", letterSpacing: "-0.03em", lineHeight: 1.15 }}>
+                  Start a<br/><span className="g-text" style={{ fontStyle: "italic" }}>project</span>
+                </span>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Stats strip — mobile */}
-        <div className="mt-16 lg:hidden grid grid-cols-2 gap-4 reveal">
-          <DataCard value="5+" label="Projects Shipped" accent={BLUE} />
-          <DataCard value="2–3w" label="Avg Delivery" accent={BLUE2} />
-          <DataCard value="100%" label="Fixed Scope" accent={BLUE} />
-          <DataCard value="UG" label="Kampala Based" accent={BLUE2} />
-        </div>
-
-        {/* Bottom rule */}
-        <div className="mt-20 md:mt-28 border-t reveal" style={{ borderColor: "rgba(255,255,255,0.07)", paddingTop: 28 }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { v: "5+", l: "Projects Shipped" },
-              { v: "2–3w", l: "Delivery" },
-              { v: "100%", l: "Fixed Scope" },
-              { v: "UG", l: "Kampala Based" },
-            ].map((s) => (
-              <div key={s.l} className="hidden lg:block">
-                <div style={{ fontSize: 42, fontWeight: 800, color: "#f0f4ff", letterSpacing: "-0.04em", lineHeight: 1 }}>{s.v}</div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(240,244,255,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", marginTop: 8 }}>{s.l}</div>
-              </div>
-            ))}
+        {/* Floating pills — desktop */}
+        <div className="hidden lg:block">
+          <div className="flt-c" style={{ position: "absolute", right: "6%", top: "22%", zIndex: 3 }}>
+            <Pill value="100%" label="Fixed scope" />
           </div>
         </div>
       </div>
+
+      {/* Bottom gradient fade */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 180, background: `linear-gradient(to top, ${BG}, transparent)`, pointerEvents: "none", zIndex: 3 }} />
     </section>
   );
 }
 
-/* ─── Process ─── */
-function Process() {
-  const steps = [
-    { n: "01", k: "Discover", v: "30-min call. We scope the project, agree timeline and price upfront." },
-    { n: "02", k: "Design & build", v: "2–3 weeks. One round of revisions. You see progress every few days." },
-    { n: "03", k: "Launch", v: "We ship, train you on edits, and stay available for 30 days of support." },
+/* ─── Marquee ticker ─── */
+function Marquee() {
+  const items = [
+    "Web Design", "Digital Products", "Kampala", "East Africa",
+    "React", "Tailwind CSS", "Supabase", "Framer Motion",
+    "Real Estate", "Consulting", "Fitness", "Sports",
+    "Responsive", "Fast", "Premium",
   ];
+  const doubled = [...items, ...items];
   return (
-    <section className="px-6 md:px-10 pb-10 md:pb-16" style={{ background: BG }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-          {steps.map((s, i) => (
-            <div
-              key={s.n}
-              className="refract-border reveal"
-              data-delay={i * 100}
-              style={{
-                background: "rgba(8,8,16,0.6)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)",
-                borderRadius: 20,
-                padding: "28px 28px",
-                transition: "border-color 0.3s ease, box-shadow 0.3s ease",
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = "rgba(0,194,255,0.3)";
-                el.style.boxShadow = `0 0 40px rgba(0,87,255,0.1)`;
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.borderColor = "rgba(255,255,255,0.08)";
-                el.style.boxShadow = "none";
-              }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="gradient-text" style={{ fontWeight: 800, fontSize: 13, letterSpacing: "0.1em" }}>{s.n}</span>
-                <span style={{ fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.5)" }}>{s.k}</span>
-              </div>
-              <p style={{ fontSize: 14, color: "rgba(240,244,255,0.8)", lineHeight: 1.7, fontWeight: 400 }}>{s.v}</p>
-            </div>
+    <div style={{ background: PANEL, borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "14px 0", overflow: "hidden" }}>
+      <div className="marquee-wrap">
+        <div className="marquee-track">
+          {doubled.map((item, i) => (
+            <span key={i} className="marquee-item">
+              <span style={{ fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(240,244,255,0.35)" }}>{item}</span>
+              <span style={{ width: 4, height: 4, borderRadius: "50%", background: B1, display: "inline-block", opacity: 0.5 }} />
+            </span>
           ))}
         </div>
-        <p className="mt-6 text-center reveal" style={{ fontSize: 12, color: "#5a6a80", letterSpacing: "0.04em" }}>
-          From {STARTING_PRICE_DISPLAY} · Fixed scope · Fixed timeline · No retainers
-        </p>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ─── Project card ─── */
-type ProjectLike = (typeof PROJECTS)[number];
-
-function ProjectCard({ p, tall, delay, priority }: { p: ProjectLike; tall?: boolean; delay: number; priority?: boolean }) {
-  const iframeH = tall === undefined ? 200 : tall ? 220 : 160;
+/* ─── Bento project card ─── */
+type P = (typeof PROJECTS)[number];
+function BentoCard({ p, height, priority }: { p: P; height?: number; priority?: boolean }) {
   return (
-    <article
-      className="overflow-hidden group reveal refract-border"
-      data-delay={delay}
-      style={{
-        background: "rgba(8,8,16,0.75)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        borderRadius: 20,
-        boxShadow: "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
-        transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease, border-color 0.35s ease",
-      }}
-      onMouseEnter={e => {
-        const el = e.currentTarget;
-        el.style.borderColor = `rgba(0,194,255,0.3)`;
-        el.style.boxShadow = `0 16px 60px rgba(0,87,255,0.12), 0 0 0 1px rgba(0,194,255,0.15), inset 0 1px 0 rgba(255,255,255,0.07)`;
-        el.style.transform = "translateY(-6px)";
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget;
-        el.style.borderColor = "rgba(255,255,255,0.08)";
-        el.style.boxShadow = "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)";
-        el.style.transform = "translateY(0)";
-      }}
-    >
-      <ProjectPreview project={p} priority={priority} height={iframeH} />
-      <div style={{ padding: "20px 22px 22px" }}>
-        <span style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase",
-          color: BLUE, background: "rgba(0,194,255,0.08)", border: `1px solid rgba(0,194,255,0.2)`,
-          borderRadius: 999, padding: "4px 12px",
-        }}>
-          <span style={{ width: 5, height: 5, borderRadius: "50%", background: BLUE, display: "inline-block", boxShadow: `0 0 6px ${BLUE}` }} />
-          {p.tag}
-        </span>
-        <h3 style={{ fontSize: 24, fontWeight: 800, color: "#f0f4ff", letterSpacing: "-0.03em", margin: "12px 0 6px", lineHeight: 1.2 }}>
-          {p.name}
-        </h3>
-        <p style={{ fontSize: 13, color: "#5a6a80", lineHeight: 1.65, fontWeight: 400 }}>
-          {p.description}
-        </p>
-        <div className="mt-5 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex flex-wrap gap-1.5">
+    <article className="bento refract-ring" style={{
+      borderRadius: 20,
+      background: "rgba(9,9,15,0.8)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+      boxShadow: "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+      overflow: "hidden",
+    }}>
+      <ProjectPreview project={p} priority={priority} height={height ?? 220} />
+      <div style={{ padding: "18px 22px 22px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            fontSize: 9, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase",
+            color: B1, background: "rgba(0,194,255,0.07)",
+            border: `1px solid rgba(0,194,255,0.18)`,
+            borderRadius: 999, padding: "3px 10px",
+          }}>
+            <span style={{ width: 4, height: 4, borderRadius: "50%", background: B1, boxShadow: `0 0 6px ${B1}`, display: "inline-block" }} />
+            {p.tag}
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(240,244,255,0.28)", letterSpacing: "0.1em" }}>{p.year}</span>
+        </div>
+        <h3 style={{ fontWeight: 800, fontSize: "clamp(20px, 2vw, 26px)", color: "#f0f4ff", letterSpacing: "-0.03em", margin: "0 0 6px", lineHeight: 1.15 }}>{p.name}</h3>
+        <p style={{ fontSize: 13, color: "#4a5a70", lineHeight: 1.6, margin: "0 0 14px" }}>{p.description}</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
             {p.stack.map((s) => (
-              <span key={s} className="stack-chip" style={{
-                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-                borderRadius: 6, fontSize: 11, color: "rgba(240,244,255,0.55)", padding: "3px 9px", fontWeight: 500,
-              }}>{s}</span>
+              <span key={s} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 5, fontSize: 10, color: "rgba(240,244,255,0.45)", padding: "2px 8px", fontWeight: 500 }}>{s}</span>
             ))}
           </div>
-          <Link to="/work/$slug" params={{ slug: p.slug }} className="visit-link" style={{
-            fontSize: 12, fontWeight: 700, color: BLUE, letterSpacing: "0.04em", textDecoration: "none",
-          }}>
-            Case study <span className="arrow">→</span>
-          </Link>
+          <Link to="/work/$slug" params={{ slug: p.slug }} data-hover style={{ fontSize: 11, fontWeight: 700, color: B1, textDecoration: "none", display: "flex", alignItems: "center", gap: 4, transition: "gap .2s ease" }}
+            onMouseEnter={e => (e.currentTarget.style.gap = "8px")}
+            onMouseLeave={e => (e.currentTarget.style.gap = "4px")}
+          >Case study →</Link>
         </div>
       </div>
     </article>
   );
 }
 
-function Projects() {
-  const left = [PROJECTS[0], PROJECTS[2]];
-  const right = [PROJECTS[1], PROJECTS[3]];
-  const odd = PROJECTS[4];
+/* ─── Work section — bento grid ─── */
+function Work() {
+  const [a, b, c, d, e] = PROJECTS;
   return (
-    <section id="work" className="px-6 md:px-10 py-28 md:py-40 relative" style={{ background: BG }}>
-      <FluidBg style={{ opacity: 0.5 }} />
-      <div className="relative max-w-7xl mx-auto" style={{ zIndex: 2 }}>
-        <div className="reveal mb-14">
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: BLUE, marginBottom: 14 }}>Selected Work</div>
-          <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: "#f0f4ff", letterSpacing: "-0.04em", lineHeight: 1, fontSize: "clamp(40px, 6vw, 72px)" }}>
-            Built for results.
-          </h2>
-          <p style={{ fontSize: 11, color: "#5a6a80", letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 10, fontWeight: 600 }}>
-            Client projects · 2024–2025
+    <section id="work" style={{ background: BG, padding: "clamp(64px, 10vw, 120px) clamp(20px, 5vw, 60px)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        {/* Header */}
+        <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "clamp(32px, 5vw, 56px)", flexWrap: "wrap", gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 12 }}>Selected Work</div>
+            <h2 style={{ fontWeight: 800, fontSize: "clamp(36px, 6vw, 80px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.93, margin: 0 }}>
+              Built for<br /><span className="g-text" style={{ fontStyle: "italic" }}>results.</span>
+            </h2>
+          </div>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.16em", color: "#4a5a70", maxWidth: 180, textAlign: "right", lineHeight: 1.5 }}>
+            Client projects<br />2024–2025
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 items-start">
-          <div className="flex flex-col gap-5 md:gap-6">
-            <ProjectCard p={left[0]} tall delay={0} priority />
-            <ProjectCard p={left[1]} tall delay={200} />
+
+        {/* Bento grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridTemplateRows: "auto auto auto", gap: "clamp(10px, 1.2vw, 16px)" }}>
+          {/* Row 1: 2/3 + 1/3 */}
+          <div className="rv" style={{ gridColumn: "1 / 3", gridRow: "1" }} data-d="0">
+            <BentoCard p={a} height={260} priority />
           </div>
-          <div className="flex flex-col gap-5 md:gap-6 md:mt-14">
-            <ProjectCard p={right[0]} tall={false} delay={100} />
-            <ProjectCard p={right[1]} tall={false} delay={300} />
+          <div className="rv" style={{ gridColumn: "3 / 4", gridRow: "1" }} data-d="80">
+            <BentoCard p={b} height={260} />
+          </div>
+          {/* Row 2: 1/3 + 2/3 */}
+          <div className="rv" style={{ gridColumn: "1 / 2", gridRow: "2" }} data-d="120">
+            <BentoCard p={c} height={200} />
+          </div>
+          <div className="rv" style={{ gridColumn: "2 / 4", gridRow: "2" }} data-d="180">
+            <BentoCard p={d} height={200} />
+          </div>
+          {/* Row 3: full width */}
+          <div className="rv" style={{ gridColumn: "1 / 4", gridRow: "3" }} data-d="240">
+            <BentoCard p={e} height={220} />
           </div>
         </div>
-        <div className="mt-5 md:mt-6 mx-auto w-full md:w-1/2">
-          <ProjectCard p={odd} delay={500} />
+
+        {/* Mobile: single column fallback */}
+        <style>{`@media(max-width:768px){#work-bento{display:flex!important;flex-direction:column}}`}</style>
+        <div id="work-bento" style={{ display: "none" }}>
+          {PROJECTS.map((p, i) => (
+            <div key={p.slug} className="rv" data-d={i * 80}>
+              <BentoCard p={p} />
+            </div>
+          ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Services — numbered list ─── */
+const SVCS = [
+  { n: "01", title: "Web Design", body: "Custom-built websites that reflect your brand, load fast, and convert visitors. Designed mobile-first, pixel-perfect on every screen." },
+  { n: "02", title: "Digital Presence", body: "Landing pages and product sites shipped in 2–3 weeks. From wireframe to live URL — scope, timeline, and price locked upfront." },
+  { n: "03", title: "Performance & SEO", body: "Sub-3-second page loads, semantic HTML, and structured metadata. Sites that rank, load, and convert from day one." },
+  { n: "04", title: "Brand & Visual Identity", body: "Consistent design language across your website, materials, and touchpoints — so your brand looks intentional everywhere." },
+];
+
+function Services() {
+  return (
+    <section id="services" style={{ background: PANEL, padding: "clamp(64px, 10vw, 120px) clamp(20px, 5vw, 60px)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(32px, 6vw, 80px)", alignItems: "start" }}>
+          {/* Left: headline */}
+          <div className="rv" style={{ gridColumn: "1 / 2" }}>
+            <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 16 }}>Services</div>
+            <h2 style={{ fontWeight: 800, fontSize: "clamp(36px, 5vw, 72px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.93, margin: "0 0 24px" }}>
+              What we <span className="g-text" style={{ fontStyle: "italic" }}>do.</span>
+            </h2>
+            <p style={{ fontSize: "clamp(14px, 1.4vw, 15px)", color: "rgba(240,244,255,0.55)", lineHeight: 1.75, maxWidth: 360, margin: 0 }}>
+              From first conversation to live site in 2–3 weeks. Scoped, priced, and delivered — no surprises.
+            </p>
+            <div className="rv" data-d="200" style={{ marginTop: "clamp(28px, 4vw, 48px)" }}>
+              <a href={MAILTO} data-hover style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                padding: "12px 24px", borderRadius: 10,
+                background: `linear-gradient(135deg,${B1},${B2})`,
+                color: "#050505", fontWeight: 800, fontSize: 13, letterSpacing: "-0.01em",
+                textDecoration: "none", boxShadow: `0 0 28px rgba(0,87,255,0.3)`,
+                transition: "box-shadow .25s, opacity .2s",
+              }}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 48px rgba(0,87,255,0.55)`)}
+                onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 28px rgba(0,87,255,0.3)`)}
+              >Start a project →</a>
+            </div>
+          </div>
+
+          {/* Right: numbered list */}
+          <div className="rv" data-d="100" style={{ gridColumn: "2 / 3" }}>
+            {SVCS.map((s) => (
+              <div key={s.n} className="svc-row">
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 18, flex: 1 }}>
+                  <span className="svc-num">{s.n}</span>
+                  <div>
+                    <div className="svc-title" style={{ fontSize: "clamp(22px, 2.5vw, 30px)" }}>{s.title}</div>
+                    <div className="svc-desc">{s.body}</div>
+                  </div>
+                </div>
+                <span className="svc-arrow">↗</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile: stack */}
+        <style>{`@media(max-width:768px){#svc-grid{grid-template-columns:1fr!important}#svc-grid>div:first-child,#svc-grid>div:last-child{grid-column:1/2!important}}`}</style>
+        <div id="svc-grid" style={{ display: "none" }} />
       </div>
     </section>
   );
@@ -466,92 +541,52 @@ function Projects() {
 /* ─── About ─── */
 function About() {
   return (
-    <section id="about" className="px-6 md:px-10 py-28 md:py-40 relative" style={{ background: BG }}>
-      <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 md:gap-16">
-        <div className="md:col-span-7 reveal">
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: BLUE, marginBottom: 20 }}>About</div>
-          <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: "#f0f4ff", fontSize: "clamp(36px, 5.5vw, 72px)", lineHeight: 1.0, letterSpacing: "-0.04em" }}>
-            The user is the<br />
-            <span className="gradient-text" style={{ fontStyle: "italic" }}>only reality.</span>
-          </h2>
-          <div className="mt-10 space-y-5" style={{ fontSize: "clamp(14px, 1.5vw, 16px)", color: "rgba(240,244,255,0.7)", lineHeight: 1.75, maxWidth: 520 }}>
-            <p>Virello is a Kampala-based web design studio building digital products for businesses across Uganda and East Africa.</p>
-            <p>Our philosophy is simple: complexity belongs in the system, not on the user. Every pixel earns its place. Every interaction has a job. We bridge brand, engineering, and intuition so your site loads fast, looks sharp, and converts.</p>
-          </div>
-        </div>
-
-        <div className="md:col-span-5 reveal" data-delay="120">
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.4)", marginBottom: 20 }}>Experience</div>
-          <ul style={{ borderTop: "1px solid rgba(255,255,255,0.07)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            {[
-              { c: "Virello Studio", r: "Founder · Lead Designer", y: "2024 — Now" },
-              { c: "Client Projects", r: "Web & Product Design", y: "2024 — Now" },
-              { c: "Freelance", r: "UI / Frontend", y: "2022 — 2024" },
-            ].map((e) => (
-              <li key={e.c} className="py-5 flex items-baseline justify-between gap-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 18, color: "#f0f4ff", letterSpacing: "-0.02em" }}>{e.c}</div>
-                  <div style={{ fontSize: 12, color: "#5a6a80", marginTop: 4, fontWeight: 500 }}>{e.r}</div>
-                </div>
-                <div style={{ fontSize: 12, color: "#5a6a80", whiteSpace: "nowrap", fontWeight: 500 }}>{e.y}</div>
-              </li>
-            ))}
-          </ul>
-
-          {/* Floating metric cards */}
-          <div className="mt-8 grid grid-cols-2 gap-3">
-            {[
-              { v: "Sub-3s", l: "Page loads" },
-              { v: "Mobile", l: "First design" },
-            ].map((m, i) => (
-              <DataCard key={m.l} value={m.v} label={m.l} accent={i === 0 ? BLUE : BLUE2} floatClass={i === 0 ? "float-a" : "float-b"} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Services ─── */
-const SERVICES = [
-  { n: "01", title: "Web Design", body: "Custom-built websites that reflect your brand and turn visitors into customers. Pixel-perfect interfaces, designed mobile-first." },
-  { n: "02", title: "Digital Presence", body: "Landing pages, product pages, and launch-ready sites shipped in 2–3 weeks. From wireframe to live URL." },
-  { n: "03", title: "Performance & SEO", body: "Sub-3-second loads, semantic HTML, structured metadata. Built to rank, built to convert." },
-];
-
-function Services() {
-  return (
-    <section id="services" className="px-6 md:px-10 py-24 md:py-32 relative" style={{ background: BG }}>
-      <FluidBg style={{ opacity: 0.4 }} />
-      <div className="relative max-w-7xl mx-auto" style={{ zIndex: 2 }}>
-        <div className="reveal mb-14">
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: BLUE, marginBottom: 14 }}>Services</div>
-          <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: "#f0f4ff", fontSize: "clamp(36px, 5.5vw, 64px)", lineHeight: 1.0, letterSpacing: "-0.04em" }}>
-            What we <span className="gradient-text" style={{ fontStyle: "italic" }}>do.</span>
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {SERVICES.map((s, i) => (
-            <div
-              key={s.title}
-              className="service-card refract-border reveal"
-              data-delay={i * 100}
-              style={{
-                padding: "36px 32px",
-                background: "rgba(8,8,16,0.65)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)",
-                borderRadius: 20,
-              }}
-            >
-              <div className="gradient-text mb-10" style={{ fontWeight: 800, fontSize: 13, letterSpacing: "0.1em" }}>{s.n}</div>
-              <h3 style={{ fontWeight: 800, fontSize: "clamp(24px, 2.5vw, 30px)", color: "#f0f4ff", letterSpacing: "-0.03em", lineHeight: 1.1 }}>{s.title}</h3>
-              <p style={{ fontSize: 14, color: "rgba(240,244,255,0.6)", marginTop: 14, lineHeight: 1.7, fontWeight: 400 }}>{s.body}</p>
+    <section id="about" style={{ background: BG, padding: "clamp(64px, 10vw, 120px) clamp(20px, 5vw, 60px)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div className="rule rv" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px, 6vw, 80px)", marginTop: "clamp(40px, 6vw, 80px)", alignItems: "start" }}>
+          {/* Left */}
+          <div className="rv">
+            <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 20 }}>About</div>
+            <h2 style={{ fontWeight: 800, fontSize: "clamp(36px, 5.5vw, 80px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.9, margin: "0 0 32px" }}>
+              User is the<br /><span className="g-text" style={{ fontStyle: "italic" }}>only reality.</span>
+            </h2>
+            <div style={{ maxWidth: 440 }}>
+              <p style={{ fontSize: "clamp(14px, 1.4vw, 15px)", color: "rgba(240,244,255,0.65)", lineHeight: 1.8, margin: "0 0 16px" }}>
+                Virello is a Kampala-based web design studio building digital experiences for businesses across Uganda and East Africa.
+              </p>
+              <p style={{ fontSize: "clamp(14px, 1.4vw, 15px)", color: "rgba(240,244,255,0.65)", lineHeight: 1.8, margin: 0 }}>
+                Complexity belongs in the system, not on the user. Every pixel earns its place. Every interaction has a purpose.
+              </p>
             </div>
-          ))}
+          </div>
+
+          {/* Right: experience + pills */}
+          <div className="rv" data-d="120">
+            <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.2em", color: "rgba(240,244,255,0.3)", marginBottom: 20 }}>Experience</div>
+            <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+              {[
+                { c: "Virello Studio", r: "Founder & Lead Designer", y: "2024 — Now" },
+                { c: "Client Projects", r: "Web Design & Development", y: "2024 — Now" },
+                { c: "Freelance Work", r: "UI / Frontend Design", y: "2022 — 2024" },
+              ].map((ex, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, padding: "20px 0", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: 17, color: "#f0f4ff", letterSpacing: "-0.025em" }}>{ex.c}</div>
+                    <div style={{ fontSize: 12, color: "#4a5a70", marginTop: 4, fontWeight: 500 }}>{ex.r}</div>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#4a5a70", whiteSpace: "nowrap", fontWeight: 500, paddingTop: 2 }}>{ex.y}</div>
+                </li>
+              ))}
+            </ul>
+            {/* Metric pills */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 24 }}>
+              <Pill value="&lt;3s" label="Page load" flt="flt-a" />
+              <Pill value="100%" label="Mobile first" flt="flt-b" />
+            </div>
+          </div>
         </div>
+        <style>{`@media(max-width:768px){#about-grid{grid-template-columns:1fr!important}}`}</style>
       </div>
     </section>
   );
@@ -560,165 +595,122 @@ function Services() {
 /* ─── Pricing ─── */
 function Pricing() {
   return (
-    <section id="pricing" className="px-6 md:px-10 py-24 md:py-32 relative" style={{ background: BG }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="reveal mb-14">
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: BLUE, marginBottom: 14 }}>Pricing</div>
-          <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: "#f0f4ff", fontSize: "clamp(36px, 5.5vw, 64px)", lineHeight: 1.0, letterSpacing: "-0.04em" }}>
-            Transparent.
+    <section id="pricing" style={{ background: PANEL, padding: "clamp(64px, 10vw, 120px) clamp(20px, 5vw, 60px)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div className="rv" style={{ marginBottom: "clamp(36px, 5vw, 60px)" }}>
+          <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 14 }}>Pricing</div>
+          <h2 style={{ fontWeight: 800, fontSize: "clamp(36px, 6vw, 80px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.93, margin: "0 0 10px" }}>
+            Transparent<br /><span className="g-text" style={{ fontStyle: "italic" }}>pricing.</span>
           </h2>
-          <p style={{ fontSize: 11, color: "#5a6a80", letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 10, fontWeight: 600 }}>
-            Fixed scope · {PRICING.paymentTerms}
-          </p>
+          <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.16em", color: "#4a5a70", margin: 0 }}>{PRICING.paymentTerms}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-          {PRICING.packages.map((pkg, i) => {
-            const highlighted = pkg.highlight;
-            return (
-              <div
-                key={pkg.id}
-                className="reveal flex flex-col relative refract-border"
-                data-delay={i * 100}
-                style={{
-                  borderRadius: 20,
-                  padding: "32px 28px",
-                  background: highlighted
-                    ? "linear-gradient(160deg, rgba(0,87,255,0.12) 0%, rgba(0,194,255,0.06) 100%)"
-                    : "rgba(8,8,16,0.7)",
-                  border: highlighted
-                    ? `1px solid rgba(0,194,255,0.35)`
-                    : "1px solid rgba(255,255,255,0.08)",
-                  backdropFilter: "blur(24px)",
-                  WebkitBackdropFilter: "blur(24px)",
-                  boxShadow: highlighted
-                    ? `0 0 60px rgba(0,87,255,0.15), 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(0,194,255,0.15)`
-                    : "0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
-                }}
-              >
-                {highlighted && (
-                  <span style={{
-                    position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
-                    padding: "4px 16px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
-                    letterSpacing: "0.15em", borderRadius: 999,
-                    background: `linear-gradient(135deg, ${BLUE}, ${BLUE2})`,
-                    color: "#050505",
-                    boxShadow: `0 0 20px rgba(0,87,255,0.4)`,
-                  }}>Most Popular</span>
-                )}
-
-                <h3 style={{ fontWeight: 800, fontSize: 24, color: "#f0f4ff", letterSpacing: "-0.03em" }}>{pkg.name}</h3>
-
-                <div className="mt-4 flex items-baseline gap-1">
-                  {pkg.pricePrefix && <span style={{ fontSize: 13, color: "#5a6a80", fontWeight: 500 }}>{pkg.pricePrefix}</span>}
-                  <span style={{ fontWeight: 800, fontSize: "clamp(26px, 3vw, 34px)", color: "#f0f4ff", letterSpacing: "-0.04em" }}>
-                    {formatUGX(pkg.price)}
-                  </span>
-                </div>
-
-                <p style={{ marginTop: 10, fontSize: 13, color: "#5a6a80", lineHeight: 1.6, fontWeight: 400 }}>{pkg.tagline}</p>
-
-                <ul className="mt-6 space-y-2.5 flex-1">
-                  {pkg.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3" style={{ fontSize: 13.5, color: "rgba(240,244,255,0.85)", lineHeight: 1.6 }}>
-                      <span style={{ color: BLUE, marginTop: 2, fontWeight: 700, fontSize: 12 }}>✓</span>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href={mailtoSubject(`New project — ${pkg.name} package`)}
-                  style={{
-                    marginTop: 28,
-                    display: "block",
-                    textAlign: "center",
-                    padding: "12px 24px",
-                    borderRadius: 10,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    textDecoration: "none",
-                    letterSpacing: "-0.01em",
-                    transition: "opacity 0.2s ease, box-shadow 0.2s ease",
-                    ...(highlighted
-                      ? { background: `linear-gradient(135deg, ${BLUE}, ${BLUE2})`, color: "#050505", boxShadow: `0 0 24px rgba(0,87,255,0.35)` }
-                      : { border: `1px solid rgba(0,194,255,0.3)`, color: BLUE, background: "transparent" }),
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
-                  onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-                >
-                  Get started →
-                </a>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "clamp(10px, 1.2vw, 16px)" }}>
+          {PRICING.packages.map((pkg, i) => (
+            <div key={pkg.id} className="price-card refract-ring rv" data-d={i * 80}
+              style={{ position: "relative", borderRadius: 20, padding: "28px 24px 24px", display: "flex", flexDirection: "column",
+                background: pkg.highlight ? "linear-gradient(160deg, rgba(0,87,255,0.1) 0%, rgba(0,194,255,0.05) 100%)" : "rgba(9,9,15,0.8)",
+                border: pkg.highlight ? `1px solid rgba(0,194,255,0.32)` : "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+                boxShadow: pkg.highlight ? `0 0 60px rgba(0,87,255,0.12), 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(0,194,255,0.14)` : "0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+              }}
+            >
+              {pkg.highlight && (
+                <span style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)",
+                  padding: "4px 14px", fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.15em",
+                  borderRadius: 999, background: `linear-gradient(135deg,${B1},${B2})`,
+                  color: "#050505", boxShadow: `0 0 20px rgba(0,87,255,0.4)`, whiteSpace: "nowrap",
+                }}>Most Popular</span>
+              )}
+              <h3 style={{ fontWeight: 800, fontSize: 20, color: "#f0f4ff", letterSpacing: "-0.03em", margin: "0 0 6px" }}>{pkg.name}</h3>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 8 }}>
+                {pkg.pricePrefix && <span style={{ fontSize: 12, color: "#4a5a70" }}>{pkg.pricePrefix}</span>}
+                <span style={{ fontWeight: 800, fontSize: 28, color: "#f0f4ff", letterSpacing: "-0.04em" }}>{formatUGX(pkg.price)}</span>
               </div>
-            );
-          })}
+              <p style={{ fontSize: 12.5, color: "#4a5a70", lineHeight: 1.6, margin: "0 0 20px" }}>{pkg.tagline}</p>
+              <ul style={{ flex: 1, margin: "0 0 24px", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+                {pkg.features.map((f) => (
+                  <li key={f} style={{ display: "flex", gap: 10, fontSize: 13, color: "rgba(240,244,255,0.82)", lineHeight: 1.5 }}>
+                    <span style={{ color: B1, fontWeight: 700, fontSize: 11, marginTop: 2, flexShrink: 0 }}>✓</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href={mailtoSubject(`${pkg.name} package — new project`)} data-hover
+                style={{ display: "block", textAlign: "center", padding: "11px 20px", borderRadius: 10,
+                  fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.01em",
+                  transition: "opacity .2s, box-shadow .2s",
+                  ...(pkg.highlight
+                    ? { background: `linear-gradient(135deg,${B1},${B2})`, color: "#050505", boxShadow: `0 0 24px rgba(0,87,255,0.3)` }
+                    : { border: `1px solid rgba(0,194,255,0.28)`, color: B1, background: "transparent" }),
+                }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.82")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              >Get started →</a>
+            </div>
+          ))}
         </div>
 
         {/* Add-ons */}
-        <div className="mt-10 reveal" style={{
-          borderRadius: 20, padding: "28px 32px",
-          background: "rgba(8,8,16,0.7)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
+        <div className="rv" data-d="120" style={{ marginTop: "clamp(12px, 1.5vw, 18px)", borderRadius: 20, padding: "24px 28px",
+          background: "rgba(9,9,15,0.8)", border: "1px solid rgba(255,255,255,0.07)",
+          backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
         }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: BLUE, marginBottom: 18 }}>Optional Add-ons</div>
-          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-            {PRICING.addons.map((addon) => (
-              <li key={addon.name} className="flex items-baseline justify-between gap-4 pb-3 sm:pb-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <span style={{ fontSize: 14, color: "rgba(240,244,255,0.8)", fontWeight: 500 }}>{addon.name}</span>
-                <span style={{ fontWeight: 800, fontSize: 16, color: BLUE, whiteSpace: "nowrap" }}>
-                  {formatUGX(addon.price)}<span style={{ fontSize: 11, color: "#5a6a80", fontWeight: 500 }}>{addon.unit}</span>
-                </span>
-              </li>
+          <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 16 }}>Add-ons</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "16px 24px" }}>
+            {PRICING.addons.map((a) => (
+              <div key={a.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <span style={{ fontSize: 13, color: "rgba(240,244,255,0.75)", fontWeight: 500 }}>{a.name}</span>
+                <span style={{ fontWeight: 800, fontSize: 15, color: B1, whiteSpace: "nowrap" }}>{formatUGX(a.price)}<span style={{ fontSize: 10, color: "#4a5a70", fontWeight: 500 }}>{a.unit}</span></span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
-        <p className="mt-7 text-center reveal" style={{ fontSize: 12, color: "#5a6a80" }}>
-          {PRICING.paymentTerms} · All prices in Ugandan Shillings · No hidden fees
-        </p>
+        <p className="rv" style={{ textAlign: "center", fontSize: 11, color: "#4a5a70", marginTop: 16 }}>All prices in Ugandan Shillings · No hidden fees · No retainers</p>
+        <style>{`@media(max-width:768px){#pricing-grid{grid-template-columns:1fr!important}}`}</style>
       </div>
     </section>
   );
 }
 
-/* ─── StickyCTA ─── */
-function StickyCTA() {
+/* ─── Full-bleed CTA banner ─── */
+function CTABanner() {
   return (
-    <section className="px-6 md:px-10 py-16 md:py-24" style={{ background: BG }}>
-      <div className="max-w-5xl mx-auto reveal relative overflow-hidden" style={{
-        borderRadius: 24, padding: "48px 40px md:64px",
-        background: "linear-gradient(135deg, rgba(0,87,255,0.1) 0%, rgba(0,194,255,0.06) 50%, rgba(0,40,180,0.08) 100%)",
-        border: "1px solid rgba(0,194,255,0.2)",
-        boxShadow: "0 0 80px rgba(0,87,255,0.1), 0 8px 40px rgba(0,0,0,0.4)",
-      }}>
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(0,194,255,0.5), transparent)" }} />
-        <div className="noise-overlay" style={{ opacity: 0.03 }} />
-        <div className="grid md:grid-cols-[1fr_auto] items-center gap-8">
-          <div>
-            <h3 style={{ fontWeight: 800, fontSize: "clamp(30px, 4.5vw, 52px)", color: "#f0f4ff", letterSpacing: "-0.04em", lineHeight: 1.05 }}>
-              Like what you see?
-            </h3>
-            <p style={{ marginTop: 14, fontSize: "clamp(14px, 1.5vw, 16px)", color: "rgba(240,244,255,0.7)", maxWidth: 480, lineHeight: 1.7 }}>
-              Tell us about your project. We reply within one business day — usually faster.
-            </p>
+    <section style={{ background: BG, padding: "clamp(64px, 10vw, 120px) clamp(20px, 5vw, 60px)", position: "relative", overflow: "hidden" }}>
+      {/* Glow */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "60vw", height: "40vw", maxWidth: 800, background: `radial-gradient(ellipse, rgba(0,87,255,0.1) 0%, transparent 65%)`, filter: "blur(80px)" }} />
+      </div>
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 2 }}>
+        <div className="rv" style={{ borderRadius: 24, padding: "clamp(40px, 7vw, 80px)", overflow: "hidden", position: "relative",
+          background: "linear-gradient(145deg, rgba(0,87,255,0.09) 0%, rgba(0,194,255,0.05) 50%, rgba(0,20,120,0.07) 100%)",
+          border: "1px solid rgba(0,194,255,0.18)",
+          boxShadow: "0 0 80px rgba(0,87,255,0.08), 0 8px 40px rgba(0,0,0,0.4)",
+        }}>
+          {/* Top highlight line */}
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "linear-gradient(90deg, transparent, rgba(0,194,255,0.5), transparent)" }} />
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "clamp(24px, 5vw, 60px)", alignItems: "center", flexWrap: "wrap" }}>
+            <div>
+              <h2 style={{ fontWeight: 800, fontSize: "clamp(32px, 5.5vw, 72px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.95, margin: "0 0 16px" }}>
+                Ready to build<br />something <span className="g-text" style={{ fontStyle: "italic" }}>great?</span>
+              </h2>
+              <p style={{ fontSize: "clamp(13px, 1.4vw, 15px)", color: "rgba(240,244,255,0.6)", maxWidth: 440, lineHeight: 1.75, margin: 0 }}>
+                Tell us about your project. We reply within one business day — usually faster. Fixed scope, fixed timeline.
+              </p>
+            </div>
+            <a href={MAILTO} data-hover
+              style={{ display: "inline-block", whiteSpace: "nowrap", padding: "16px 32px", borderRadius: 12,
+                background: `linear-gradient(135deg,${B1},${B2})`,
+                color: "#050505", fontSize: 14, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.01em",
+                boxShadow: `0 0 32px rgba(0,87,255,0.35)`,
+                transition: "box-shadow .25s ease, opacity .2s ease",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 56px rgba(0,87,255,0.6)`)}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 32px rgba(0,87,255,0.35)`)}
+            >Start a project →</a>
           </div>
-          <a
-            href={MAILTO}
-            style={{
-              display: "inline-block", whiteSpace: "nowrap",
-              padding: "16px 32px", borderRadius: 12,
-              background: `linear-gradient(135deg, ${BLUE}, ${BLUE2})`,
-              color: "#050505", fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em",
-              textDecoration: "none",
-              boxShadow: "0 0 32px rgba(0,87,255,0.4)",
-              transition: "box-shadow 0.25s ease, opacity 0.25s ease",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 0 56px rgba(0,87,255,0.6)")}
-            onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 0 32px rgba(0,87,255,0.4)")}
-          >
-            Start a project →
-          </a>
+          <style>{`@media(max-width:640px){.cta-inner{grid-template-columns:1fr!important}}`}</style>
         </div>
       </div>
     </section>
@@ -728,52 +720,52 @@ function StickyCTA() {
 /* ─── Contact ─── */
 function Contact() {
   return (
-    <section id="contact" className="px-6 md:px-10 py-28 md:py-36 relative" style={{ background: PANEL }}>
-      <FluidBg style={{ opacity: 0.6 }} />
-      <div className="relative max-w-7xl mx-auto grid md:grid-cols-12 gap-14 md:gap-20" style={{ zIndex: 2 }}>
-        <div className="md:col-span-6 reveal">
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: BLUE, marginBottom: 20 }}>Contact</div>
-          <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: "#f0f4ff", fontSize: "clamp(40px, 6vw, 88px)", lineHeight: 0.95, letterSpacing: "-0.04em" }}>
-            Ready to<br />
-            start the<br />
-            <span className="gradient-text" style={{ fontStyle: "italic" }}>project?</span>
-          </h2>
-          <p style={{ marginTop: 28, fontSize: "clamp(14px, 1.5vw, 16px)", color: "rgba(240,244,255,0.65)", maxWidth: 420, lineHeight: 1.7 }}>
-            Currently accepting new projects. Tell us about yours — we reply within one business day, usually faster.
-          </p>
-        </div>
-        <div className="md:col-span-6 reveal" data-delay="120">
-          <div className="space-y-10">
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.35)", marginBottom: 12 }}>Email</div>
-              <a
-                href={`mailto:${EMAIL}`}
-                style={{ fontWeight: 800, fontSize: "clamp(18px, 2.5vw, 26px)", color: "#f0f4ff", textDecoration: "none", letterSpacing: "-0.03em", transition: "color 0.2s" }}
-                onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
+    <section id="contact" style={{ background: PANEL, padding: "clamp(64px, 10vw, 120px) clamp(20px, 5vw, 60px)", position: "relative", overflow: "hidden" }}>
+      {/* Background orb */}
+      <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: "50vw", height: "50vw", maxWidth: 600, background: `radial-gradient(ellipse, rgba(0,87,255,0.1) 0%, transparent 65%)`, filter: "blur(80px)", pointerEvents: "none" }} />
+
+      <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 2 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(48px, 8vw, 100px)", alignItems: "start" }}>
+          {/* Left */}
+          <div className="rv">
+            <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 20 }}>Get in Touch</div>
+            <h2 style={{ fontWeight: 800, fontSize: "clamp(48px, 8vw, 110px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.88, margin: "0 0 24px" }}>
+              Let's talk<br /><span className="g-text" style={{ fontStyle: "italic" }}>about it.</span>
+            </h2>
+            <p style={{ fontSize: "clamp(13px, 1.4vw, 15px)", color: "rgba(240,244,255,0.55)", lineHeight: 1.8, maxWidth: 360, margin: 0 }}>
+              Currently accepting new projects. Describe your goals and we'll respond within one business day.
+            </p>
+          </div>
+
+          {/* Right */}
+          <div className="rv" data-d="100">
+            <div style={{ marginBottom: 36 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.2em", color: "rgba(240,244,255,0.3)", marginBottom: 10 }}>Email</div>
+              <a href={`mailto:${EMAIL}`} data-hover style={{ fontWeight: 800, fontSize: "clamp(16px, 2.2vw, 24px)", color: "#f0f4ff", textDecoration: "none", letterSpacing: "-0.03em", transition: "color .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color = B1)}
                 onMouseLeave={e => (e.currentTarget.style.color = "#f0f4ff")}
               >{EMAIL}</a>
             </div>
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(240,244,255,0.35)", marginBottom: 12 }}>Studio</div>
-              <div style={{ color: "rgba(240,244,255,0.85)", fontSize: 16, fontWeight: 600 }}>Kampala, Uganda</div>
-              <div style={{ color: "#5a6a80", fontSize: 13, marginTop: 5, fontWeight: 400 }}>Working remotely across East Africa</div>
+            <div style={{ marginBottom: 40 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.2em", color: "rgba(240,244,255,0.3)", marginBottom: 10 }}>Location</div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: "#f0f4ff", letterSpacing: "-0.025em" }}>Kampala, Uganda</div>
+              <div style={{ fontSize: 12, color: "#4a5a70", marginTop: 4 }}>Serving clients across East Africa · Remote-friendly</div>
             </div>
-            <a href={MAILTO} className="inline-flex items-center gap-4 group">
-              <span style={{
-                height: 60, width: 60, borderRadius: "50%", flexShrink: 0,
-                background: `linear-gradient(135deg, ${BLUE}, ${BLUE2})`,
+            <a href={MAILTO} data-hover style={{ display: "inline-flex", alignItems: "center", gap: 14, textDecoration: "none" }}
+              onMouseEnter={e => { const c = e.currentTarget.querySelector<HTMLElement>(".c2"); if (c) { c.style.transform = "scale(1.1)"; c.style.boxShadow = `0 0 56px rgba(0,87,255,0.65)`; } }}
+              onMouseLeave={e => { const c = e.currentTarget.querySelector<HTMLElement>(".c2"); if (c) { c.style.transform = "scale(1)"; c.style.boxShadow = `0 0 36px rgba(0,87,255,0.4)`; } }}
+            >
+              <span className="c2" style={{ width: 60, height: 60, borderRadius: "50%",
+                background: `linear-gradient(135deg,${B1},${B2})`,
                 color: "#050505", display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 22, fontWeight: 800,
-                boxShadow: `0 0 36px rgba(0,87,255,0.45)`,
-                transition: "transform 0.25s ease, box-shadow 0.25s ease",
-              }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "scale(1.1)"; el.style.boxShadow = `0 0 56px rgba(0,87,255,0.65)`; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "scale(1)"; el.style.boxShadow = `0 0 36px rgba(0,87,255,0.45)`; }}
-              >→</span>
-              <span style={{ fontWeight: 800, fontSize: 22, color: "#f0f4ff", letterSpacing: "-0.03em" }}>Send a brief</span>
+                fontSize: 22, fontWeight: 800, boxShadow: `0 0 36px rgba(0,87,255,0.4)`,
+                transition: "transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease", flexShrink: 0,
+              }}>→</span>
+              <span style={{ fontWeight: 800, fontSize: "clamp(18px, 2vw, 22px)", color: "#f0f4ff", letterSpacing: "-0.03em" }}>Send a brief</span>
             </a>
           </div>
         </div>
+        <style>{`@media(max-width:768px){#contact-grid{grid-template-columns:1fr!important}}`}</style>
       </div>
     </section>
   );
@@ -782,54 +774,111 @@ function Contact() {
 /* ─── Footer ─── */
 function Footer() {
   return (
-    <footer className="px-6 md:px-10 py-12" style={{ background: BG, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-      <div className="max-w-7xl mx-auto grid gap-8 md:grid-cols-3" style={{ fontSize: 13, color: "#5a6a80" }}>
+    <footer style={{ background: BG, borderTop: "1px solid rgba(255,255,255,0.06)", padding: "clamp(32px, 5vw, 52px) clamp(20px, 5vw, 60px)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px 40px", fontSize: 12, color: "#4a5a70" }}>
         <div>
-          <div style={{ fontWeight: 800, fontSize: 20, color: "#f0f4ff", letterSpacing: "-0.04em", marginBottom: 8 }}>Virello</div>
-          <p style={{ lineHeight: 1.65, fontWeight: 400 }}>Web design studio. Kampala, Uganda.</p>
-          <a href={`mailto:${EMAIL}`} style={{ marginTop: 10, display: "inline-block", color: BLUE, textDecoration: "none", fontWeight: 600, transition: "opacity 0.2s" }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = "0.75")}
+          <div style={{ fontWeight: 800, fontSize: 18, color: "#f0f4ff", letterSpacing: "-0.04em", marginBottom: 8 }}>Virello<span style={{ color: B1 }}>.</span></div>
+          <p style={{ lineHeight: 1.6, margin: "0 0 10px" }}>Web design studio. Kampala, Uganda.</p>
+          <a href={`mailto:${EMAIL}`} data-hover style={{ color: B1, textDecoration: "none", fontWeight: 600, transition: "opacity .2s" }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = "0.7")}
             onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
           >{EMAIL}</a>
         </div>
         <div>
-          <div style={{ textTransform: "uppercase", letterSpacing: "0.15em", fontSize: 10, color: "rgba(240,244,255,0.4)", fontWeight: 700, marginBottom: 14 }}>Work</div>
-          <ul className="space-y-2">
+          <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.2em", color: "rgba(240,244,255,0.3)", marginBottom: 14 }}>Work</div>
+          <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
             {PROJECTS.map((p) => (
               <li key={p.slug}>
-                <Link to="/work/$slug" params={{ slug: p.slug }} style={{ color: "#5a6a80", textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = BLUE)}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#5a6a80")}
+                <Link to="/work/$slug" params={{ slug: p.slug }} data-hover style={{ color: "#4a5a70", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = B1)}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#4a5a70")}
                 >{p.name}</Link>
               </li>
             ))}
           </ul>
         </div>
-        <div className="md:text-right md:self-end" style={{ fontWeight: 500 }}>© 2026 Virello · Kampala, Uganda</div>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end", textAlign: "right" }}>
+          <div style={{ fontWeight: 600, color: "#4a5a70" }}>© 2026 Virello</div>
+          <div style={{ marginTop: 4 }}>Kampala, Uganda</div>
+        </div>
       </div>
+      <style>{`@media(max-width:640px){footer>div>div{grid-template-columns:1fr!important}footer>div>div>div:last-child{text-align:left!important}}`}</style>
     </footer>
   );
 }
 
-/* ─── Page ─── */
+/* ─── Responsive grid fixes (inline for SSR safety) ─── */
+const responsiveFix = `
+  @media(max-width:768px){
+    #work>div>div:first-of-type{display:none!important}
+    #work>div>div:last-of-type{display:flex!important}
+    #svc-main{grid-template-columns:1fr!important}
+    #pricing-cards{grid-template-columns:1fr!important}
+    #contact>div>div>div{grid-template-columns:1fr!important}
+    .cta-inner{grid-template-columns:1fr!important}
+    #about>div>div:last-child{grid-template-columns:1fr!important}
+    .work-bento-desktop{display:none!important}
+    .work-bento-mobile{display:flex!important;flex-direction:column;gap:12px}
+  }
+  @media(min-width:769px){
+    .work-bento-mobile{display:none!important}
+    .work-bento-desktop{display:grid!important}
+  }
+`;
+
+/* ─── Page root ─── */
 function Index() {
   useCustomCursor();
+  useParallax();
   useReveal();
   return (
-    <main className="min-h-screen relative" style={{ background: BG, color: "#f0f4ff" }}>
-      <div className="global-noise" aria-hidden />
-      <div className="relative" style={{ zIndex: 1 }}>
-        <Nav />
+    <div style={{ background: BG, color: "#f0f4ff", minHeight: "100svh" }}>
+      <style>{responsiveFix}</style>
+      <div className="grain" aria-hidden />
+      <Nav />
+      <main>
         <Hero />
-        <Process />
-        <Projects />
+        <Marquee />
+        {/* Desktop bento */}
+        <section id="work" style={{ background: BG, padding: "clamp(64px,10vw,120px) clamp(20px,5vw,60px)" }}>
+          <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+            <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "clamp(32px,5vw,56px)", flexWrap: "wrap", gap: 16 }}>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.2em", color: B1, marginBottom: 12 }}>Selected Work</div>
+                <h2 style={{ fontWeight: 800, fontSize: "clamp(36px,6vw,80px)", color: "#f0f4ff", letterSpacing: "-0.045em", lineHeight: 0.93, margin: 0 }}>
+                  Built for<br /><span className="g-text" style={{ fontStyle: "italic" }}>results.</span>
+                </h2>
+              </div>
+              <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.16em", color: "#4a5a70", maxWidth: 160, textAlign: "right", lineHeight: 1.5 }}>
+                Client projects<br />2024–2025
+              </p>
+            </div>
+
+            {/* Desktop bento */}
+            <div className="work-bento-desktop" style={{ gridTemplateColumns: "repeat(3,1fr)", gap: "clamp(10px,1.2vw,16px)" }}>
+              <div className="rv" style={{ gridColumn: "1/3" }} data-d="0"><BentoCard p={PROJECTS[0]} height={260} priority /></div>
+              <div className="rv" style={{ gridColumn: "3/4" }} data-d="80"><BentoCard p={PROJECTS[1]} height={260} /></div>
+              <div className="rv" style={{ gridColumn: "1/2" }} data-d="120"><BentoCard p={PROJECTS[2]} height={200} /></div>
+              <div className="rv" style={{ gridColumn: "2/4" }} data-d="180"><BentoCard p={PROJECTS[3]} height={200} /></div>
+              <div className="rv" style={{ gridColumn: "1/4" }} data-d="240"><BentoCard p={PROJECTS[4]} height={220} /></div>
+            </div>
+
+            {/* Mobile stack */}
+            <div className="work-bento-mobile">
+              {PROJECTS.map((p, i) => (
+                <div key={p.slug} className="rv" data-d={i * 60}><BentoCard p={p} /></div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <Services />
         <About />
         <Pricing />
-        <StickyCTA />
-        <Services />
+        <CTABanner />
         <Contact />
-        <Footer />
-      </div>
-    </main>
+      </main>
+      <Footer />
+    </div>
   );
 }
