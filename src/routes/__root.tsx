@@ -12,17 +12,23 @@ import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "#050505" }}>
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontSize: 96, color: "#f0f4ff", letterSpacing: "-0.04em" }}>404</h1>
+        <h2 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, fontSize: 20, color: "#f0f4ff", marginTop: 8 }}>Page not found</h2>
+        <p style={{ color: "#5a6a80", fontSize: 14, marginTop: 8 }}>
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <div className="mt-6">
+        <div style={{ marginTop: 24 }}>
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              padding: "10px 24px", borderRadius: 999,
+              background: "linear-gradient(135deg, #00c2ff, #0057ff)",
+              color: "#050505", fontWeight: 700, fontSize: 14,
+              textDecoration: "none",
+            }}
           >
             Go home
           </Link>
@@ -35,29 +41,33 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "#050505" }}>
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <h1 style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontSize: 24, color: "#f0f4ff" }}>
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <p style={{ color: "#5a6a80", fontSize: 14, marginTop: 8 }}>
+          Something went wrong. Try refreshing or head back home.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div style={{ marginTop: 24, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <button
-            onClick={() => {
-              router.invalidate();
-              reset();
+            onClick={() => { router.invalidate(); reset(); }}
+            style={{
+              padding: "10px 20px", borderRadius: 999,
+              background: "linear-gradient(135deg, #00c2ff, #0057ff)",
+              color: "#050505", fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer",
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            style={{
+              padding: "10px 20px", borderRadius: 999,
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "#f0f4ff", fontWeight: 600, fontSize: 14, textDecoration: "none",
+            }}
           >
             Go home
           </a>
@@ -89,15 +99,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://virellosites.lovable.app/og-cover.jpg" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&display=swap",
       },
     ],
     scripts: [
@@ -109,8 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "Virello",
           url: "https://virellosites.lovable.app",
           email: "katongoleshane@gmail.com",
-          description:
-            "Web design studio building websites and digital products for businesses across East Africa.",
+          description: "Web design studio building websites and digital products for businesses across East Africa.",
           address: {
             "@type": "PostalAddress",
             addressLocality: "Kampala",
@@ -144,7 +150,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
