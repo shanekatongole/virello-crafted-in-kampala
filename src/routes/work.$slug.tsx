@@ -1,8 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getProject, PROJECTS, PROJECT_IMAGES } from "@/lib/projects";
 import { STUDIO_EMAIL, mailtoSubject } from "@/lib/constants";
-
-const SITE = "https://virellosites.lovable.app";
+import { getSiteUrl } from "@/lib/site-url";
 const EMAIL = STUDIO_EMAIL;
 
 export const Route = createFileRoute("/work/$slug")({
@@ -16,8 +15,9 @@ export const Route = createFileRoute("/work/$slug")({
     if (!project) return { meta: [{ title: "Case study — Virello" }] };
     const title = `${project.name} — Virello case study`;
     const desc = project.description;
-    const url = `${SITE}/work/${params.slug}`;
-    const image = `${SITE}/og/${project.slug}.jpg`;
+    const siteUrl = getSiteUrl();
+    const url = `${siteUrl}/work/${params.slug}`;
+    const image = `${siteUrl}/og/${project.slug}.jpg`;
     return {
       meta: [
         { title },

@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { PROJECTS } from "@/lib/projects";
-
-const BASE_URL = "https://virellosites.lovable.app";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        const baseUrl = getSiteUrl();
         const entries = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           ...PROJECTS.map((p) => ({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         const urls = entries.map(
           (e) =>
-            `  <url>\n    <loc>${BASE_URL}${e.path}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`,
+            `  <url>\n    <loc>${baseUrl}${e.path}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`,
         );
 
         const xml = [

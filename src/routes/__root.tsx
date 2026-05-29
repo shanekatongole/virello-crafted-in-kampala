@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { getSiteUrl } from "@/lib/site-url";
 
 function NotFoundComponent() {
   return (
@@ -78,7 +79,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  head: () => {
+    const siteUrl = getSiteUrl();
+    return {
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -89,14 +92,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Virello — Web Design Studio, Kampala" },
       { property: "og:description", content: "Virello is a Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://virellosites.lovable.app" },
-      { property: "og:image", content: "https://virellosites.lovable.app/og-cover.jpg" },
+      { property: "og:url", content: siteUrl },
+      { property: "og:image", content: `${siteUrl}/og-cover.jpg` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Virello — Web Design Studio, Kampala" },
       { name: "twitter:description", content: "Virello is a Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa." },
-      { name: "twitter:image", content: "https://virellosites.lovable.app/og-cover.jpg" },
+      { name: "twitter:image", content: `${siteUrl}/og-cover.jpg` },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -114,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "Virello",
-          url: "https://virellosites.lovable.app",
+          url: siteUrl,
           email: "katongoleshane@gmail.com",
           description: "Web design studio building websites and digital products for businesses across East Africa.",
           address: {
@@ -123,11 +126,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             addressCountry: "UG",
           },
           areaServed: "East Africa",
-          logo: "https://virellosites.lovable.app/og-cover.jpg",
+          logo: `${siteUrl}/og-cover.jpg`,
         }),
       },
     ],
-  }),
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
