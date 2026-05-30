@@ -17,10 +17,10 @@ import {
 
 export const Route = createFileRoute("/")({ component: Index });
 
-const B1 = "#00c2ff";
-const B2 = "#0057ff";
-const BG = "#050505";
-const PANEL = "#09090f";
+const B1 = "#e8e8ed";
+const B2 = "#a8a8b3";
+const BG = "#060608";
+const PANEL = "#0c0c0f";
 const MAILTO = mailtoSubject("New project enquiry");
 const EMAIL = STUDIO_EMAIL;
 
@@ -601,8 +601,8 @@ function Pricing() {
                     top: -12,
                     left: "50%",
                     transform: "translateX(-50%)",
-                    background: "linear-gradient(135deg, #8b5cf6, #0057ff)",
-                    color: "#f8fafc",
+                    background: "linear-gradient(135deg, #d4af37, #a8862a)",
+                    color: "#060608",
                     border: "none",
                   }}
                 >
