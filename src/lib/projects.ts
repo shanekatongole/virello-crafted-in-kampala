@@ -32,8 +32,7 @@ export const PROJECTS: Project[] = [
     url: "https://kampala-dream-homes.lovable.app",
     tag: "Real Estate",
     year: "2025",
-    description:
-      "Premium property listings platform for Kampala's luxury real estate market.",
+    description: "Premium property listings platform for Kampala's luxury real estate market.",
     stack: ["React", "Supabase", "Tailwind"],
     problem:
       "Kampala's luxury real estate buyers were stuck browsing low-trust classified sites with no filters, slow load times, and stock-photo listings that all looked the same.",
@@ -64,8 +63,7 @@ export const PROJECTS: Project[] = [
     url: "https://metafit256.katongoleshane.workers.dev/",
     tag: "Fitness",
     year: "2025",
-    description:
-      "Premier gym in Kampala — strength training, elite coaching, and group fitness.",
+    description: "Premier gym in Kampala — strength training, elite coaching, and group fitness.",
     stack: ["React", "Cloudflare Workers", "Tailwind"],
     problem:
       "MetaFit256 wanted to stand apart from generic gym sites and attract serious lifters and high-intent members in Kampala.",
@@ -80,8 +78,7 @@ export const PROJECTS: Project[] = [
     url: "https://roofman-ug-builds-trust.lovable.app",
     tag: "Construction",
     year: "2025",
-    description:
-      "Professional roofing and waterproofing contractors serving Kampala and beyond.",
+    description: "Professional roofing and waterproofing contractors serving Kampala and beyond.",
     stack: ["React", "Tailwind", "Lovable"],
     problem:
       "A trusted local contractor was losing high-value jobs to bigger firms because their online presence didn't match the quality of their work.",
@@ -96,8 +93,7 @@ export const PROJECTS: Project[] = [
     url: "https://silverfin-academy.lovable.app",
     tag: "Sports",
     year: "2025",
-    description:
-      "Premium swimming programs and elite competition coaching for all ages.",
+    description: "Premium swimming programs and elite competition coaching for all ages.",
     stack: ["React", "Supabase", "Tailwind"],
     problem:
       "A premium swim club needed a website that felt as refined as their coaching, with clear pathways for parents, adults, and competitive swimmers.",
@@ -108,5 +104,4 @@ export const PROJECTS: Project[] = [
   },
 ];
 
-export const getProject = (slug: string) =>
-  PROJECTS.find((p) => p.slug === slug);
+export const getProject = (slug: string) => PROJECTS.find((p) => p.slug === slug);

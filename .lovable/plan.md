@@ -17,6 +17,7 @@ Expected result: First paint of the work section drops from 5+ iframe loads to 5
 ## 2. Per-project case study routes
 
 One file per project under `src/routes/work.$slug.tsx` with:
+
 - Hero: project name, tag, year, live URL
 - Static screenshot (large)
 - Problem · Approach · Result (3 short paragraphs — you'll provide copy later; we'll seed reasonable placeholders you can edit)
@@ -47,7 +48,7 @@ Full-width band between Selected Works and Services:
 
 > **Like what you see?**
 > Tell us about your project. We reply within one business day.
-> [Start a project →]  (mailto with subject "New project — [your name]")
+> [Start a project →] (mailto with subject "New project — [your name]")
 
 Glass panel, large Cormorant Garamond italic heading, cyan accent border.
 
@@ -69,6 +70,7 @@ Glass panel, large Cormorant Garamond italic heading, cyan accent border.
 ## 7. Footer additions
 
 Keep minimal but add:
+
 - Email link (so the footer also converts)
 - Small list of project names linking to their case studies (helps SEO + gives crawlers internal links)
 

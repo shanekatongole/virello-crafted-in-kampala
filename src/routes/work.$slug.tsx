@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getProject, PROJECTS, PROJECT_IMAGES } from "@/lib/projects";
 import { STUDIO_EMAIL, mailtoSubject } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site-url";
+import { GlassButton } from "@/components/ui/glass-button";
 const EMAIL = STUDIO_EMAIL;
 
 export const Route = createFileRoute("/work/$slug")({
@@ -69,25 +70,16 @@ function CaseStudy() {
   const others = PROJECTS.filter((p) => p.slug !== project.slug).slice(0, 3);
 
   return (
-    <main
-      className="min-h-screen text-white relative"
-      style={{ background: "#080c14" }}
-    >
+    <main className="min-h-screen text-white relative" style={{ background: "#080c14" }}>
       <div className="global-noise" aria-hidden />
       <div className="relative" style={{ zIndex: 1 }}>
         {/* Top bar */}
         <header className="fixed top-0 inset-x-0 z-40 bg-[rgba(8,12,20,0.85)] backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
-            <Link
-              to="/"
-              className="font-display text-[22px] text-white tracking-tight"
-            >
+            <Link to="/" className="font-display text-[22px] text-white tracking-tight">
               Virello
             </Link>
-            <Link
-              to="/"
-              className="text-[13px] font-medium px-4 py-2 rounded-full border border-[rgba(0,200,255,0.4)] text-[#00C8FF] hover:bg-[rgba(0,200,255,0.1)] transition-colors"
-            >
+            <Link to="/" className="lg-btn lg-btn--ghost lg-btn--sm">
               ← All work
             </Link>
           </div>
@@ -144,26 +136,22 @@ function CaseStudy() {
             </div>
 
             <div className="mt-16 flex flex-wrap items-center gap-4">
-              <a
+              <GlassButton
                 href={project.url}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="inline-block bg-[#00C8FF] text-[#080c14] px-7 py-3 text-[14px] font-semibold hover:opacity-90 transition-opacity"
+                variant="primary"
+                size="lg"
               >
                 Visit live site ↗
-              </a>
-              <a
-                href={mailto}
-                className="inline-block border border-[#00C8FF] text-[#00C8FF] px-7 py-3 text-[14px] font-medium hover:bg-[rgba(0,200,255,0.1)] transition-colors"
-              >
+              </GlassButton>
+              <GlassButton href={mailto} variant="secondary" size="lg">
                 Start a similar project →
-              </a>
+              </GlassButton>
             </div>
 
             <div className="mt-32">
-              <h2 className="font-display text-white text-[28px] md:text-[36px] mb-8">
-                More work
-              </h2>
+              <h2 className="font-display text-white text-[28px] md:text-[36px] mb-8">More work</h2>
               <ul className="grid sm:grid-cols-3 gap-4">
                 {others.map((p) => (
                   <li key={p.slug}>
@@ -175,9 +163,7 @@ function CaseStudy() {
                       <div className="text-[11px] uppercase tracking-[0.15em] text-[#00C8FF] mb-2">
                         {p.tag}
                       </div>
-                      <div className="font-display text-[22px] text-white">
-                        {p.name}
-                      </div>
+                      <div className="font-display text-[22px] text-white">{p.name}</div>
                     </Link>
                   </li>
                 ))}
@@ -189,10 +175,7 @@ function CaseStudy() {
         <footer className="px-6 md:px-10 py-8 border-t border-white/5">
           <div className="max-w-7xl mx-auto flex items-center justify-between text-[12px] text-[#7a8a9a]">
             <span>© 2026 Virello</span>
-            <a
-              href={`mailto:${EMAIL}`}
-              className="text-[#00C8FF] hover:underline"
-            >
+            <a href={`mailto:${EMAIL}`} className="text-[#00C8FF] hover:underline">
               {EMAIL}
             </a>
           </div>
@@ -205,9 +188,7 @@ function CaseStudy() {
 function Block({ label, body }: { label: string; body: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-3">
-        {label}
-      </div>
+      <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-3">{label}</div>
       <p className="text-[15px] text-white/85 leading-relaxed">{body}</p>
     </div>
   );
