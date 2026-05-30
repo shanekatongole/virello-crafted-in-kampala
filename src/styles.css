@@ -129,20 +129,24 @@ html[data-perf="high"] .glass-dark {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #060608;
+  background: radial-gradient(ellipse 75% 60% at 50% 45%, #1a1530 0%, #0a0a14 45%, #060608 80%);
   contain: strict;
   isolation: isolate;
 }
 .hero-ambient-gif {
   position: absolute;
-  inset: -5%;
-  width: 110%;
-  height: 110%;
+  top: 50%;
+  left: 50%;
   object-fit: cover;
   object-position: center center;
-  opacity: 0.9;
+  width: max(100%, 100vh);
+  height: max(100%, 100vw);
+  min-width: 100%;
+  min-height: 100%;
+  opacity: 0.95;
   filter: saturate(0.95) contrast(1.02);
-  transform: translateZ(0);
+  transform: translate3d(-50%, -50%, 0) scale(1.25);
+  transform-origin: center center;
   will-change: transform;
 }
 .hero-ambient-pause-fill {
