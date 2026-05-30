@@ -55,7 +55,7 @@ export const Route = createFileRoute("/work/$slug")({
     <div className="min-h-screen flex items-center justify-center text-white">
       <div className="text-center">
         <h1 className="font-display text-5xl mb-4">Project not found</h1>
-        <Link to="/" className="text-[#00C8FF] underline">
+        <Link to="/" className="text-[#e8e8ed] underline">
           Back to Virello
         </Link>
       </div>
@@ -88,7 +88,7 @@ function CaseStudy() {
         <article className="pt-32 pb-24 px-6 md:px-10">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-3 mb-6 text-[12px] uppercase tracking-[0.18em] text-[#7a8a9a]">
-              <span className="text-[#00C8FF]">●</span>
+              <span className="text-[#e8e8ed]">●</span>
               <span>{project.tag}</span>
               <span>·</span>
               <span>{project.year}</span>
@@ -160,7 +160,7 @@ function CaseStudy() {
                       params={{ slug: p.slug }}
                       className="block p-5 rounded-xl glass hover:border-[rgba(0,200,255,0.3)] transition-colors"
                     >
-                      <div className="text-[11px] uppercase tracking-[0.15em] text-[#00C8FF] mb-2">
+                      <div className="text-[11px] uppercase tracking-[0.15em] text-[#e8e8ed] mb-2">
                         {p.tag}
                       </div>
                       <div className="font-display text-[22px] text-white">{p.name}</div>
@@ -175,7 +175,7 @@ function CaseStudy() {
         <footer className="px-6 md:px-10 py-8 border-t border-white/5">
           <div className="max-w-7xl mx-auto flex items-center justify-between text-[12px] text-[#7a8a9a]">
             <span>© 2026 Virello</span>
-            <a href={`mailto:${EMAIL}`} className="text-[#00C8FF] hover:underline">
+            <a href={`mailto:${EMAIL}`} className="text-[#e8e8ed] hover:underline">
               {EMAIL}
             </a>
           </div>
@@ -188,7 +188,7 @@ function CaseStudy() {
 function Block({ label, body }: { label: string; body: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-[0.18em] text-[#00C8FF] mb-3">{label}</div>
+      <div className="text-[11px] uppercase tracking-[0.18em] text-[#e8e8ed] mb-3">{label}</div>
       <p className="text-[15px] text-white/85 leading-relaxed">{body}</p>
     </div>
   );
