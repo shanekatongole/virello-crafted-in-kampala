@@ -263,7 +263,7 @@ function Hero({ motionActive, tier }: { motionActive: boolean; tier: PerfTier })
             </div>
           </div>
           <div className="flex md:justify-end items-end en" style={{ animationDelay: ".78s" }}>
-            <a href={MAILTO} className="hero-cta-link">
+            <a href="#contact" className="hero-cta-link">
               <span className="hero-cta-icon">→</span>
               <span className="hero-cta-text">
                 Start a<br />
@@ -445,7 +445,7 @@ function Services() {
               surprises.
             </p>
             <div className="rv" data-d="200" style={{ marginTop: "clamp(1.75rem, 4vw, 3rem)" }}>
-              <GlassButton href={MAILTO} variant="primary">
+              <GlassButton href="#contact" variant="primary">
                 Start a project →
               </GlassButton>
             </div>
@@ -746,7 +746,7 @@ function CTABanner() {
                 scope, fixed timeline.
               </p>
             </div>
-            <GlassButton href={MAILTO} variant="primary" size="lg" className="shrink-0">
+            <GlassButton href="#contact" variant="primary" size="lg" className="shrink-0">
               Start a project →
             </GlassButton>
           </div>

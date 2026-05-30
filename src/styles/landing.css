@@ -15,6 +15,7 @@
   --container: min(1280px, 100% - clamp(1.25rem, 5vw, 3.75rem) * 2);
   --section-y: clamp(4.5rem, 10vw, 7.5rem);
   --section-x: clamp(1.5rem, 5vw, 3.75rem);
+  --nav-offset: 5.5rem;
 }
 
 /* ─── Page shell ─── */
@@ -37,6 +38,7 @@
   padding-block: var(--section-y);
   padding-inline: var(--section-x);
   overflow-x: clip;
+  scroll-margin-top: var(--nav-offset);
 }
 
 .section--panel {
