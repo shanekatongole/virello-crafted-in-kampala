@@ -74,15 +74,36 @@ function useReveal() {
   }, []);
 }
 
-/* ─── Floating pill nav ─── */
+/* ─── Floating glass nav with active-section pill highlight ─── */
+const NAV_LINKS: Array<[string, string]> = [
+  ["#work", "Work"],
+  ["#services", "Services"],
+  ["#about", "About"],
+  ["#pricing", "Pricing"],
+  ["#contact", "Contact"],
+];
+
 function Nav() {
   const ref = useRef<HTMLDivElement>(null);
+  const linksRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [pill, setPill] = useState<{ left: number; width: number; visible: boolean }>({
+    left: 0,
+    width: 0,
+    visible: false,
+  });
+
+  /* Scrolled state */
   useEffect(() => {
     const fn = () => ref.current?.classList.toggle("scrolled", scrollY > 30);
+    fn();
     addEventListener("scroll", fn, { passive: true });
     return () => removeEventListener("scroll", fn);
   }, []);
+
+  /* Escape closes mobile menu */
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -91,13 +112,39 @@ function Nav() {
     return () => removeEventListener("keydown", fn);
   }, []);
 
-  const links = [
-    ["#work", "Work"],
-    ["#services", "Services"],
-    ["#about", "About"],
-    ["#pricing", "Pricing"],
-    ["#contact", "Contact"],
-  ];
+  /* Scroll-spy: track active section by viewport center */
+  useEffect(() => {
+    const ids = NAV_LINKS.map(([h]) => h.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (sections.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive("#" + visible[0].target.id);
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, []);
+
+  /* Position the sliding pill behind the hovered or active link */
+  useEffect(() => {
+    const target = hovered ?? active;
+    if (!target || !linksRef.current) {
+      setPill((p) => ({ ...p, visible: false }));
+      return;
+    }
+    const el = linksRef.current.querySelector<HTMLAnchorElement>(`a[href="${target}"]`);
+    if (!el) return;
+    const parentRect = linksRef.current.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    setPill({ left: rect.left - parentRect.left, width: rect.width, visible: true });
+  }, [hovered, active]);
 
   return (
     <>
@@ -105,9 +152,26 @@ function Nav() {
         <a href="#top" className="nav-logo">
           Virello<span>.</span>
         </a>
-        <nav className="nav-links" aria-label="Primary">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} className="nav-link">
+        <nav
+          ref={linksRef}
+          className="nav-links"
+          aria-label="Primary"
+          onMouseLeave={() => setHovered(null)}
+        >
+          <span
+            className="nav-active-pill"
+            data-visible={pill.visible}
+            style={{ transform: `translate(${pill.left}px, -50%)`, width: pill.width }}
+            aria-hidden
+          />
+          {NAV_LINKS.map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="nav-link"
+              data-active={active === href}
+              onMouseEnter={() => setHovered(href)}
+            >
               {label}
             </a>
           ))}
@@ -132,18 +196,18 @@ function Nav() {
             <span
               style={{
                 display: "block",
-                width: 22,
+                width: 20,
                 height: 1.5,
                 background: "#f0f4ff",
                 borderRadius: 2,
                 transition: "transform .3s, opacity .3s",
-                transform: open ? "translateY(5.5px) rotate(45deg)" : "none",
+                transform: open ? "translateY(5px) rotate(45deg)" : "none",
               }}
             />
             <span
               style={{
                 display: "block",
-                width: 22,
+                width: 20,
                 height: 1.5,
                 background: "#f0f4ff",
                 borderRadius: 2,
@@ -154,12 +218,12 @@ function Nav() {
             <span
               style={{
                 display: "block",
-                width: 22,
+                width: 20,
                 height: 1.5,
                 background: "#f0f4ff",
                 borderRadius: 2,
                 transition: "transform .3s",
-                transform: open ? "translateY(-5.5px) rotate(-45deg)" : "none",
+                transform: open ? "translateY(-5px) rotate(-45deg)" : "none",
               }}
             />
           </button>
@@ -168,7 +232,7 @@ function Nav() {
 
       {open && (
         <div className="mob-menu md:hidden lg-card lg-card--blur">
-          {links.map(([href, label]) => (
+          {NAV_LINKS.map(([href, label]) => (
             <a key={href} href={href} className="mob-menu-link" onClick={() => setOpen(false)}>
               {label}
             </a>
