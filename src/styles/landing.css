@@ -574,43 +574,44 @@ html[data-perf="high"] .lg-stat--blur {
   }
 }
 
-.bento-grid {
-  display: none;
-  gap: clamp(0.625rem, 1.2vw, 1rem);
+/* ─── Puzzle-piece masonry portfolio ─── */
+.work-masonry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(0.75rem, 1.4vw, 1.125rem);
 }
 
-.bento-grid--desktop {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.bento-grid--mobile {
-  flex-direction: column;
-}
-
-@media (min-width: 769px) {
-  .bento-grid--desktop {
-    display: grid;
-  }
-  .bento-grid--mobile {
-    display: none !important;
+@media (min-width: 720px) {
+  .work-masonry {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
-@media (max-width: 768px) {
-  .bento-grid--desktop {
-    display: none !important;
-  }
-  .bento-grid--mobile {
-    display: flex;
+@media (min-width: 1024px) {
+  .work-masonry {
+    grid-template-columns: repeat(12, 1fr);
   }
 }
 
-.bento-span-2 {
-  grid-column: span 2;
+/* Mobile: every card is full width and image height fixed by component */
+.work-cell { min-width: 0; }
+
+/* Tablet (6-col) — give the featured project more weight */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .work-cell--1 { grid-column: span 6; }
+  .work-cell--2 { grid-column: span 3; }
+  .work-cell--3 { grid-column: span 3; }
+  .work-cell--4 { grid-column: span 3; }
+  .work-cell--5 { grid-column: span 3; }
 }
 
-.bento-span-3 {
-  grid-column: span 3;
+/* Desktop (12-col puzzle layout) */
+@media (min-width: 1024px) {
+  .work-cell--1 { grid-column: span 7; }   /* tall featured */
+  .work-cell--2 { grid-column: span 5; }   /* compact */
+  .work-cell--3 { grid-column: span 5; }   /* compact */
+  .work-cell--4 { grid-column: span 5; }   /* medium */
+  .work-cell--5 { grid-column: span 7; }   /* wide */
 }
 
 .section-header {
