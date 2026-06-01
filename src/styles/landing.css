@@ -613,11 +613,11 @@ html[data-perf="high"] .lg-stat--blur {
 
 /* Desktop (12-col puzzle layout) */
 @media (min-width: 1024px) {
-  .work-cell--1 { grid-column: span 7; }   /* tall featured */
-  .work-cell--2 { grid-column: span 5; }   /* compact */
-  .work-cell--3 { grid-column: span 5; }   /* compact */
-  .work-cell--4 { grid-column: span 5; }   /* medium */
-  .work-cell--5 { grid-column: span 7; }   /* wide */
+  .work-cell--1 { grid-column: span 7; }   /* row 1 left  — featured */
+  .work-cell--2 { grid-column: span 5; }   /* row 1 right — compact */
+  .work-cell--3 { grid-column: span 5; }   /* row 2 left  — compact */
+  .work-cell--4 { grid-column: span 7; }   /* row 2 right — wide   */
+  .work-cell--5 { grid-column: span 12; }  /* row 3       — full-bleed finisher */
 }
 
 .section-header {
