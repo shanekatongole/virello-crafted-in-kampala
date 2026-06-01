@@ -411,44 +411,38 @@ function Marquee() {
   );
 }
 
-/* ─── Bento project card ─── */
+/* ─── Project work card (used inside the masonry) ─── */
 type P = (typeof PROJECTS)[number];
-function BentoCard({ p, height, priority }: { p: P; height?: number; priority?: boolean }) {
+function WorkCard({
+  p,
+  imageHeight,
+  featured,
+  priority,
+}: {
+  p: P;
+  imageHeight: number;
+  featured?: boolean;
+  priority?: boolean;
+}) {
   return (
-    <article className="bento refract-ring lg-card lg-card--blur">
-      <ProjectPreview project={p} priority={priority} height={height ?? 220} />
+    <article
+      className={`work-card refract-ring lg-card lg-card--blur ${featured ? "work-card--featured" : ""}`.trim()}
+    >
+      <ProjectPreview project={p} priority={priority} height={imageHeight} />
       <div className="lg-card-body">
-        <div className="flex items-center justify-between gap-2 mb-2.5">
+        <div className="work-card-meta">
           <span className="lg-tag">
             <span className="lg-tag-dot" />
             {p.tag}
           </span>
           <span className="text-caption">{p.year}</span>
         </div>
-        <h3
-          className="heading-lg"
-          style={{ fontSize: "clamp(1.15rem, 2vw, 1.625rem)", marginBottom: "0.35rem" }}
-        >
-          {p.name}
-        </h3>
-        <p className="text-body" style={{ fontSize: "0.8125rem", marginBottom: "0.875rem" }}>
-          {p.description}
-        </p>
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex flex-wrap gap-1">
-            {p.stack.map((s) => (
-              <span
-                key={s}
-                className="lg-tag"
-                style={{
-                  textTransform: "none",
-                  letterSpacing: "0",
-                  fontSize: "0.625rem",
-                  color: "rgba(240,244,255,0.5)",
-                  background: "rgba(255,255,255,0.04)",
-                  borderColor: "rgba(255,255,255,0.08)",
-                }}
-              >
+        <h3 className="work-card-title">{p.name}</h3>
+        <p className="work-card-desc">{p.description}</p>
+        <div className="work-card-foot">
+          <div className="work-card-stack">
+            {p.stack.slice(0, 3).map((s) => (
+              <span key={s} className="work-card-chip">
                 {s}
               </span>
             ))}
@@ -457,7 +451,7 @@ function BentoCard({ p, height, priority }: { p: P; height?: number; priority?: 
             to="/work/$slug"
             params={{ slug: p.slug }}
             className="lg-btn lg-btn--ghost lg-btn--sm"
-            style={{ padding: "0.35rem 0.75rem" }}
+            style={{ padding: "0.35rem 0.75rem", flexShrink: 0 }}
           >
             Case study →
           </Link>
