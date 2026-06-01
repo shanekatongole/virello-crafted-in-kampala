@@ -987,10 +987,10 @@ function Index() {
                 <WorkCard p={PROJECTS[2]} imageHeight={200} />
               </div>
               <div className="work-cell work-cell--4 rv" data-d="200">
-                <WorkCard p={PROJECTS[3]} imageHeight={240} />
+                <WorkCard p={PROJECTS[3]} imageHeight={260} />
               </div>
               <div className="work-cell work-cell--5 rv" data-d="260">
-                <WorkCard p={PROJECTS[4]} imageHeight={300} />
+                <WorkCard p={PROJECTS[4]} imageHeight={380} />
               </div>
             </div>
           </div>
