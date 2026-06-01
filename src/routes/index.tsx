@@ -25,35 +25,6 @@ const MAILTO = mailtoSubject("New project enquiry");
 const EMAIL = STUDIO_EMAIL;
 
 /* ─── Mouse parallax via CSS vars (high tier only) ─── */
-function useParallax(enabled: boolean) {
-  useEffect(() => {
-    if (!enabled) return;
-    let raf = 0;
-    let last = 0;
-    const onMove = (e: MouseEvent) => {
-      const now = performance.now();
-      if (now - last < 32) return;
-      last = now;
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        document.documentElement.style.setProperty(
-          "--px",
-          String((e.clientX / innerWidth - 0.5).toFixed(4)),
-        );
-        document.documentElement.style.setProperty(
-          "--py",
-          String((e.clientY / innerHeight - 0.5).toFixed(4)),
-        );
-      });
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMove);
-    };
-  }, [enabled]);
-}
-
 /* ─── Scroll reveal ─── */
 function useReveal() {
   useEffect(() => {
@@ -941,7 +912,6 @@ function Index() {
   const pageVisible = usePageVisible();
   const motionActive = pageVisible && tier !== "low";
   useAmbientMotionPause(motionActive);
-  useParallax(tier === "high" && pageVisible);
   useReveal();
 
   const showGrain = tier !== "low";

@@ -19,6 +19,7 @@ type Props = {
 export function HeroAmbientBackground({ active, tier }: Props) {
   const reducedMotion = usePrefersReducedMotion();
   const [isDesktop, setIsDesktop] = useState(false);
+  const [canLoadMotion, setCanLoadMotion] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -29,8 +30,28 @@ export function HeroAmbientBackground({ active, tier }: Props) {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  // Load the heavy 55MB gif only on desktop viewports and high-performance tier
-  const loadGif = active && tier === "high" && isDesktop && !reducedMotion;
+  useEffect(() => {
+    if (!active || tier !== "high" || !isDesktop || reducedMotion) {
+      setCanLoadMotion(false);
+      return;
+    }
+
+    const win = window as Window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+    if (win.requestIdleCallback) {
+      const handle = win.requestIdleCallback(() => setCanLoadMotion(true), { timeout: 1800 });
+      return () => win.cancelIdleCallback?.(handle);
+    }
+
+    const handle = window.setTimeout(() => setCanLoadMotion(true), 900);
+    return () => window.clearTimeout(handle);
+  }, [active, isDesktop, reducedMotion, tier]);
+
+  // Load the heavy GIF only after initial paint, on desktop, and on high-performance devices.
+  const loadGif = active && tier === "high" && isDesktop && !reducedMotion && canLoadMotion;
 
   if (reducedMotion) {
     return (
@@ -51,7 +72,7 @@ export function HeroAmbientBackground({ active, tier }: Props) {
           width={1920}
           height={1080}
           decoding="async"
-          fetchPriority="high"
+          fetchPriority="low"
         />
       ) : (
         /* Highly performant, beautiful liquid CSS gradients fallback */
