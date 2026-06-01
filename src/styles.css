@@ -127,7 +127,9 @@ html[data-perf="high"] .glass-dark {
 /* ─── Hero ambient GIF background ─── */
 .hero-ambient {
   position: absolute;
-  inset: 0;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
   overflow: hidden;
   background: radial-gradient(ellipse 75% 60% at 50% 45%, #1a1530 0%, #0a0a14 45%, #060608 80%);
   contain: strict;
@@ -135,18 +137,14 @@ html[data-perf="high"] .glass-dark {
 }
 .hero-ambient-gif {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center center;
-  width: max(100%, 100vh);
-  height: max(100%, 100vw);
-  min-width: 100%;
-  min-height: 100%;
   opacity: 0.95;
   filter: saturate(0.95) contrast(1.02);
-  transform: translate3d(-50%, -50%, 0) scale(1.25);
-  transform-origin: center center;
+  transform: translateZ(0);
   will-change: transform;
 }
 .hero-ambient-pause-fill {
@@ -164,14 +162,14 @@ html[data-perf="high"] .glass-dark {
       rgba(6, 6, 8, 0.6) 0%,
       rgba(6, 6, 8, 0.1) 32%,
       rgba(6, 6, 8, 0.15) 58%,
-      rgba(6, 6, 8, 0.85) 90%,
+      rgba(6, 6, 8, 0.92) 88%,
       #060608 100%
     ),
     radial-gradient(
       ellipse 95% 75% at 50% 50%,
       transparent 0%,
       rgba(6, 6, 8, 0.2) 50%,
-      rgba(6, 6, 8, 0.9) 100%
+      rgba(6, 6, 8, 0.95) 100%
     );
 }
 .hero-ambient-vignette {
