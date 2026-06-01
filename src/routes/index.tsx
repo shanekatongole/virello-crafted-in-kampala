@@ -74,15 +74,36 @@ function useReveal() {
   }, []);
 }
 
-/* ─── Floating pill nav ─── */
+/* ─── Floating glass nav with active-section pill highlight ─── */
+const NAV_LINKS: Array<[string, string]> = [
+  ["#work", "Work"],
+  ["#services", "Services"],
+  ["#about", "About"],
+  ["#pricing", "Pricing"],
+  ["#contact", "Contact"],
+];
+
 function Nav() {
   const ref = useRef<HTMLDivElement>(null);
+  const linksRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [pill, setPill] = useState<{ left: number; width: number; visible: boolean }>({
+    left: 0,
+    width: 0,
+    visible: false,
+  });
+
+  /* Scrolled state */
   useEffect(() => {
     const fn = () => ref.current?.classList.toggle("scrolled", scrollY > 30);
+    fn();
     addEventListener("scroll", fn, { passive: true });
     return () => removeEventListener("scroll", fn);
   }, []);
+
+  /* Escape closes mobile menu */
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -91,13 +112,39 @@ function Nav() {
     return () => removeEventListener("keydown", fn);
   }, []);
 
-  const links = [
-    ["#work", "Work"],
-    ["#services", "Services"],
-    ["#about", "About"],
-    ["#pricing", "Pricing"],
-    ["#contact", "Contact"],
-  ];
+  /* Scroll-spy: track active section by viewport center */
+  useEffect(() => {
+    const ids = NAV_LINKS.map(([h]) => h.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (sections.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive("#" + visible[0].target.id);
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, []);
+
+  /* Position the sliding pill behind the hovered or active link */
+  useEffect(() => {
+    const target = hovered ?? active;
+    if (!target || !linksRef.current) {
+      setPill((p) => ({ ...p, visible: false }));
+      return;
+    }
+    const el = linksRef.current.querySelector<HTMLAnchorElement>(`a[href="${target}"]`);
+    if (!el) return;
+    const parentRect = linksRef.current.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    setPill({ left: rect.left - parentRect.left, width: rect.width, visible: true });
+  }, [hovered, active]);
 
   return (
     <>
@@ -105,9 +152,26 @@ function Nav() {
         <a href="#top" className="nav-logo">
           Virello<span>.</span>
         </a>
-        <nav className="nav-links" aria-label="Primary">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} className="nav-link">
+        <nav
+          ref={linksRef}
+          className="nav-links"
+          aria-label="Primary"
+          onMouseLeave={() => setHovered(null)}
+        >
+          <span
+            className="nav-active-pill"
+            data-visible={pill.visible}
+            style={{ transform: `translate(${pill.left}px, -50%)`, width: pill.width }}
+            aria-hidden
+          />
+          {NAV_LINKS.map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="nav-link"
+              data-active={active === href}
+              onMouseEnter={() => setHovered(href)}
+            >
               {label}
             </a>
           ))}
@@ -132,18 +196,18 @@ function Nav() {
             <span
               style={{
                 display: "block",
-                width: 22,
+                width: 20,
                 height: 1.5,
                 background: "#f0f4ff",
                 borderRadius: 2,
                 transition: "transform .3s, opacity .3s",
-                transform: open ? "translateY(5.5px) rotate(45deg)" : "none",
+                transform: open ? "translateY(5px) rotate(45deg)" : "none",
               }}
             />
             <span
               style={{
                 display: "block",
-                width: 22,
+                width: 20,
                 height: 1.5,
                 background: "#f0f4ff",
                 borderRadius: 2,
@@ -154,12 +218,12 @@ function Nav() {
             <span
               style={{
                 display: "block",
-                width: 22,
+                width: 20,
                 height: 1.5,
                 background: "#f0f4ff",
                 borderRadius: 2,
                 transition: "transform .3s",
-                transform: open ? "translateY(-5.5px) rotate(-45deg)" : "none",
+                transform: open ? "translateY(-5px) rotate(-45deg)" : "none",
               }}
             />
           </button>
@@ -168,7 +232,7 @@ function Nav() {
 
       {open && (
         <div className="mob-menu md:hidden lg-card lg-card--blur">
-          {links.map(([href, label]) => (
+          {NAV_LINKS.map(([href, label]) => (
             <a key={href} href={href} className="mob-menu-link" onClick={() => setOpen(false)}>
               {label}
             </a>
@@ -347,44 +411,38 @@ function Marquee() {
   );
 }
 
-/* ─── Bento project card ─── */
+/* ─── Project work card (used inside the masonry) ─── */
 type P = (typeof PROJECTS)[number];
-function BentoCard({ p, height, priority }: { p: P; height?: number; priority?: boolean }) {
+function WorkCard({
+  p,
+  imageHeight,
+  featured,
+  priority,
+}: {
+  p: P;
+  imageHeight: number;
+  featured?: boolean;
+  priority?: boolean;
+}) {
   return (
-    <article className="bento refract-ring lg-card lg-card--blur">
-      <ProjectPreview project={p} priority={priority} height={height ?? 220} />
+    <article
+      className={`work-card refract-ring lg-card lg-card--blur ${featured ? "work-card--featured" : ""}`.trim()}
+    >
+      <ProjectPreview project={p} priority={priority} height={imageHeight} />
       <div className="lg-card-body">
-        <div className="flex items-center justify-between gap-2 mb-2.5">
+        <div className="work-card-meta">
           <span className="lg-tag">
             <span className="lg-tag-dot" />
             {p.tag}
           </span>
           <span className="text-caption">{p.year}</span>
         </div>
-        <h3
-          className="heading-lg"
-          style={{ fontSize: "clamp(1.15rem, 2vw, 1.625rem)", marginBottom: "0.35rem" }}
-        >
-          {p.name}
-        </h3>
-        <p className="text-body" style={{ fontSize: "0.8125rem", marginBottom: "0.875rem" }}>
-          {p.description}
-        </p>
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex flex-wrap gap-1">
-            {p.stack.map((s) => (
-              <span
-                key={s}
-                className="lg-tag"
-                style={{
-                  textTransform: "none",
-                  letterSpacing: "0",
-                  fontSize: "0.625rem",
-                  color: "rgba(240,244,255,0.5)",
-                  background: "rgba(255,255,255,0.04)",
-                  borderColor: "rgba(255,255,255,0.08)",
-                }}
-              >
+        <h3 className="work-card-title">{p.name}</h3>
+        <p className="work-card-desc">{p.description}</p>
+        <div className="work-card-foot">
+          <div className="work-card-stack">
+            {p.stack.slice(0, 3).map((s) => (
+              <span key={s} className="work-card-chip">
                 {s}
               </span>
             ))}
@@ -393,7 +451,7 @@ function BentoCard({ p, height, priority }: { p: P; height?: number; priority?: 
             to="/work/$slug"
             params={{ slug: p.slug }}
             className="lg-btn lg-btn--ghost lg-btn--sm"
-            style={{ padding: "0.35rem 0.75rem" }}
+            style={{ padding: "0.35rem 0.75rem", flexShrink: 0 }}
           >
             Case study →
           </Link>
@@ -918,30 +976,22 @@ function Index() {
               </p>
             </div>
 
-            <div className="bento-grid bento-grid--desktop">
-              <div className="rv bento-span-2" data-d="0">
-                <BentoCard p={PROJECTS[0]} height={260} priority />
+            <div className="work-masonry">
+              <div className="work-cell work-cell--1 rv" data-d="0">
+                <WorkCard p={PROJECTS[0]} imageHeight={420} featured priority />
               </div>
-              <div className="rv" data-d="80">
-                <BentoCard p={PROJECTS[1]} height={260} />
+              <div className="work-cell work-cell--2 rv" data-d="80">
+                <WorkCard p={PROJECTS[1]} imageHeight={200} />
               </div>
-              <div className="rv" data-d="120">
-                <BentoCard p={PROJECTS[2]} height={200} />
+              <div className="work-cell work-cell--3 rv" data-d="140">
+                <WorkCard p={PROJECTS[2]} imageHeight={200} />
               </div>
-              <div className="rv bento-span-2" data-d="180">
-                <BentoCard p={PROJECTS[3]} height={200} />
+              <div className="work-cell work-cell--4 rv" data-d="200">
+                <WorkCard p={PROJECTS[3]} imageHeight={260} />
               </div>
-              <div className="rv bento-span-3" data-d="240">
-                <BentoCard p={PROJECTS[4]} height={220} />
+              <div className="work-cell work-cell--5 rv" data-d="260">
+                <WorkCard p={PROJECTS[4]} imageHeight={380} />
               </div>
-            </div>
-
-            <div className="bento-grid bento-grid--mobile">
-              {PROJECTS.map((p, i) => (
-                <div key={p.slug} className="rv" data-d={i * 60}>
-                  <BentoCard p={p} />
-                </div>
-              ))}
             </div>
           </div>
         </section>

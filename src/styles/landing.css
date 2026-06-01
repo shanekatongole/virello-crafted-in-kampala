@@ -574,43 +574,50 @@ html[data-perf="high"] .lg-stat--blur {
   }
 }
 
-.bento-grid {
-  display: none;
-  gap: clamp(0.625rem, 1.2vw, 1rem);
+/* ─── Puzzle-piece masonry portfolio ─── */
+.work-masonry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(0.75rem, 1.4vw, 1.125rem);
 }
 
-.bento-grid--desktop {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.bento-grid--mobile {
-  flex-direction: column;
-}
-
-@media (min-width: 769px) {
-  .bento-grid--desktop {
-    display: grid;
-  }
-  .bento-grid--mobile {
-    display: none !important;
+@media (min-width: 720px) {
+  .work-masonry {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
-@media (max-width: 768px) {
-  .bento-grid--desktop {
-    display: none !important;
-  }
-  .bento-grid--mobile {
-    display: flex;
+@media (min-width: 1024px) {
+  .work-masonry {
+    grid-template-columns: repeat(12, 1fr);
   }
 }
 
-.bento-span-2 {
-  grid-column: span 2;
+/* Mobile: every card is full width and image height fixed by component */
+.work-cell { min-width: 0; }
+
+/* Mobile (<720px): unify image heights so single-column stack feels rhythmic */
+@media (max-width: 719px) {
+  .work-cell .project-preview { height: 220px !important; }
+  .work-cell--1 .project-preview { height: 260px !important; }
 }
 
-.bento-span-3 {
-  grid-column: span 3;
+/* Tablet (6-col) — give the featured project more weight */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .work-cell--1 { grid-column: span 6; }
+  .work-cell--2 { grid-column: span 3; }
+  .work-cell--3 { grid-column: span 3; }
+  .work-cell--4 { grid-column: span 3; }
+  .work-cell--5 { grid-column: span 3; }
+}
+
+/* Desktop (12-col puzzle layout) */
+@media (min-width: 1024px) {
+  .work-cell--1 { grid-column: span 7; }   /* row 1 left  — featured */
+  .work-cell--2 { grid-column: span 5; }   /* row 1 right — compact */
+  .work-cell--3 { grid-column: span 5; }   /* row 2 left  — compact */
+  .work-cell--4 { grid-column: span 7; }   /* row 2 right — wide   */
+  .work-cell--5 { grid-column: span 12; }  /* row 3       — full-bleed finisher */
 }
 
 .section-header {
@@ -625,37 +632,59 @@ html[data-perf="high"] .lg-stat--blur {
 /* ─── Nav ─── */
 .nav-pill {
   position: fixed;
-  top: max(1rem, env(safe-area-inset-top, 0px));
+  top: max(0.875rem, env(safe-area-inset-top, 0px));
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 0);
   z-index: 100;
-  width: min(1120px, calc(100% - 1.5rem));
-  height: 3.625rem;
-  padding: 0 clamp(0.875rem, 3vw, 1.25rem);
-  border-radius: 1.125rem;
+  width: min(880px, calc(100% - 1.25rem));
+  height: 3.25rem;
+  padding: 0 0.5rem 0 1rem;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  background: rgba(5, 5, 5, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 0.5rem;
+  background: rgba(10, 10, 14, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 8px 32px rgba(0, 0, 0, 0.4);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 10px 40px rgba(0, 0, 0, 0.45);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Custom entry that preserves horizontal centering */
+@keyframes nav-entry {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.nav-pill.en {
+  opacity: 0;
+  animation: nav-entry 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 html[data-perf="high"] .nav-pill {
-  backdrop-filter: blur(18px) saturate(1.45);
-  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+}
+
+.nav-pill.scrolled {
+  background: rgba(8, 8, 12, 0.78);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 14px 48px rgba(0, 0, 0, 0.6);
 }
 
 .nav-logo {
   font-weight: 800;
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: var(--fg);
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
   text-decoration: none;
   flex-shrink: 0;
+  padding-right: 0.5rem;
 }
 
 .nav-logo span {
@@ -665,9 +694,10 @@ html[data-perf="high"] .nav-pill {
 .nav-links {
   display: none;
   align-items: center;
-  gap: clamp(1rem, 2.5vw, 1.5rem);
-  font-size: 0.8125rem;
+  gap: 0.125rem;
+  font-size: 0.78125rem;
   font-weight: 500;
+  position: relative;
 }
 
 @media (min-width: 768px) {
@@ -677,20 +707,53 @@ html[data-perf="high"] .nav-pill {
 }
 
 .nav-link {
-  color: rgba(240, 244, 255, 0.5);
+  position: relative;
+  color: rgba(240, 244, 255, 0.55);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.25s ease;
   white-space: nowrap;
+  padding: 0.45rem 0.875rem;
+  border-radius: 999px;
+  z-index: 1;
 }
 
 .nav-link:hover {
   color: var(--fg);
 }
 
+.nav-link[data-active="true"] {
+  color: var(--fg);
+}
+
+/* sliding active-pill highlight (rendered in JSX) */
+.nav-active-pill {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+  opacity: 0;
+}
+.nav-active-pill[data-visible="true"] {
+  opacity: 1;
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin-left: auto;
 }
 
@@ -880,10 +943,6 @@ html[data-perf="high"] .site-toast {
 }
 
 /* ─── Misc overrides ─── */
-.bento.lg-card:hover {
-  transform: translateY(-4px);
-}
-
 .price-card.lg-card:hover {
   transform: translateY(-5px);
 }
@@ -900,6 +959,11 @@ html[data-perf="high"] .site-toast {
   .nav-pill .lg-btn--sm {
     display: none;
   }
+
+  .nav-pill {
+    padding-left: 0.875rem;
+    padding-right: 0.375rem;
+  }
 }
 
 .project-preview-badge {
@@ -907,6 +971,74 @@ html[data-perf="high"] .site-toast {
   font-size: 0.625rem !important;
   letter-spacing: 0.12em !important;
   padding: 0.35rem 0.75rem !important;
+}
+
+/* ─── Refined work card ─── */
+.work-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.work-card .lg-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1.125rem 1.375rem 1.25rem;
+}
+.work-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.work-card-title {
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  color: var(--fg);
+  margin: 0;
+}
+.work-card--featured .work-card-title {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+}
+.work-card-desc {
+  font-size: 0.8125rem;
+  color: rgba(240, 244, 255, 0.62);
+  line-height: 1.55;
+  margin: 0;
+  /* clamp to keep cards tidy */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.work-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.work-card-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3125rem;
+  min-width: 0;
+}
+.work-card-chip {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(240, 244, 255, 0.55);
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
 }
 
 html[data-perf="high"] .project-preview-badge {
