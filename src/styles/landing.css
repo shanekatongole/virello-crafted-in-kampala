@@ -634,7 +634,7 @@ html[data-perf="high"] .lg-stat--blur {
   position: fixed;
   top: max(0.875rem, env(safe-area-inset-top, 0px));
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 0);
   z-index: 100;
   width: min(880px, calc(100% - 1.25rem));
   height: 3.25rem;
@@ -651,6 +651,16 @@ html[data-perf="high"] .lg-stat--blur {
     inset 0 -1px 0 rgba(0, 0, 0, 0.4),
     0 10px 40px rgba(0, 0, 0, 0.45);
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Custom entry that preserves horizontal centering */
+@keyframes nav-entry {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.nav-pill.en {
+  opacity: 0;
+  animation: nav-entry 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 html[data-perf="high"] .nav-pill {
