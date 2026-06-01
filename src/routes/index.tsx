@@ -976,30 +976,22 @@ function Index() {
               </p>
             </div>
 
-            <div className="bento-grid bento-grid--desktop">
-              <div className="rv bento-span-2" data-d="0">
-                <BentoCard p={PROJECTS[0]} height={260} priority />
+            <div className="work-masonry">
+              <div className="work-cell work-cell--1 rv" data-d="0">
+                <WorkCard p={PROJECTS[0]} imageHeight={420} featured priority />
               </div>
-              <div className="rv" data-d="80">
-                <BentoCard p={PROJECTS[1]} height={260} />
+              <div className="work-cell work-cell--2 rv" data-d="80">
+                <WorkCard p={PROJECTS[1]} imageHeight={200} />
               </div>
-              <div className="rv" data-d="120">
-                <BentoCard p={PROJECTS[2]} height={200} />
+              <div className="work-cell work-cell--3 rv" data-d="140">
+                <WorkCard p={PROJECTS[2]} imageHeight={200} />
               </div>
-              <div className="rv bento-span-2" data-d="180">
-                <BentoCard p={PROJECTS[3]} height={200} />
+              <div className="work-cell work-cell--4 rv" data-d="200">
+                <WorkCard p={PROJECTS[3]} imageHeight={240} />
               </div>
-              <div className="rv bento-span-3" data-d="240">
-                <BentoCard p={PROJECTS[4]} height={220} />
+              <div className="work-cell work-cell--5 rv" data-d="260">
+                <WorkCard p={PROJECTS[4]} imageHeight={300} />
               </div>
-            </div>
-
-            <div className="bento-grid bento-grid--mobile">
-              {PROJECTS.map((p, i) => (
-                <div key={p.slug} className="rv" data-d={i * 60}>
-                  <BentoCard p={p} />
-                </div>
-              ))}
             </div>
           </div>
         </section>
