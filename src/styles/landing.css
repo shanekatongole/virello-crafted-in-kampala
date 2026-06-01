@@ -596,6 +596,12 @@ html[data-perf="high"] .lg-stat--blur {
 /* Mobile: every card is full width and image height fixed by component */
 .work-cell { min-width: 0; }
 
+/* Mobile (<720px): unify image heights so single-column stack feels rhythmic */
+@media (max-width: 719px) {
+  .work-cell .project-preview { height: 220px !important; }
+  .work-cell--1 .project-preview { height: 260px !important; }
+}
+
 /* Tablet (6-col) — give the featured project more weight */
 @media (min-width: 720px) and (max-width: 1023px) {
   .work-cell--1 { grid-column: span 6; }
