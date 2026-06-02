@@ -28,7 +28,6 @@
     font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
   }
   ::selection {
     background: #e8e8ed;
@@ -73,7 +72,6 @@ html[data-perf="high"] .grain {
 }
 html[data-perf="high"] .glass {
   backdrop-filter: blur(14px) saturate(1.35);
-  -webkit-backdrop-filter: blur(14px) saturate(1.35);
 }
 @keyframes g-shift {
   0% {
@@ -105,12 +103,6 @@ html[data-perf="high"] .glass {
   opacity: 0.95;
   filter: saturate(0.95) contrast(1.02);
   transform: translateZ(0);
-  will-change: transform;
-}
-.hero-ambient-pause-fill {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(49, 39, 64, 0.15) 0%, #060608 70%);
 }
 .hero-ambient-scrim {
   position: absolute;
@@ -147,32 +139,6 @@ html[data-perf="high"] .glass {
     radial-gradient(ellipse 90% 70% at 50% 60%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
   filter: blur(2px);
   opacity: 0.9;
-}
-
-/* ─── Liquid background (legacy — unused) ─── */
-@keyframes blob-drift-a {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(32px, -28px, 0) scale(1.04);
-  }
-}
-@keyframes blob-drift-b {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(-28px, 24px, 0) scale(1.05);
-  }
-}
-html[data-perf="high"] .liquid-blob-a {
-  animation: blob-drift-a 24s ease-in-out infinite;
-}
-html[data-perf="high"] .liquid-blob-b {
-  animation: blob-drift-b 20s ease-in-out infinite 2s;
 }
 
 /* ─── Parallax (high tier only) ─── */
@@ -239,22 +205,6 @@ html[data-perf="high"] .marquee-track {
 .clip-line .inner {
   display: block;
   animation: line-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* ─── Bento cards ─── */
-.bento {
-  transition:
-    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
-}
-.bento:hover {
-  transform: translateY(-5px) scale(1.008);
-  border-color: rgba(255, 255, 255, 0.16) !important;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
 /* ─── Service rows ─── */
@@ -394,13 +344,6 @@ html[data-perf="high"] .marquee-track {
 }
 .flt-c {
   animation: flt-c 7s ease-in-out infinite;
-}
-
-/* ─── Magnetic CTA ─── */
-.mag-btn {
-  transition:
-    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.25s ease;
 }
 
 /* ─── Beacon ─── */
