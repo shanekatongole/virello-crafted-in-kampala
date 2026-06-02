@@ -52,7 +52,7 @@ export const Route = createFileRoute("/work/$slug")({
   },
   component: CaseStudy,
   notFoundComponent: () => (
-    <div className="min-h-screen flex items-center justify-center text-white">
+    <div className="min-h-dvh flex items-center justify-center text-white">
       <div className="text-center">
         <h1 className="font-display text-5xl mb-4">Project not found</h1>
         <Link to="/" className="text-[#e8e8ed] underline">
@@ -70,11 +70,11 @@ function CaseStudy() {
   const others = PROJECTS.filter((p) => p.slug !== project.slug).slice(0, 3);
 
   return (
-    <main className="min-h-screen text-white relative" style={{ background: "#080c14" }}>
+    <main className="min-h-dvh text-white relative" style={{ background: "#060608" }}>
       <div className="global-noise" aria-hidden />
       <div className="relative" style={{ zIndex: 1 }}>
         {/* Top bar */}
-        <header className="fixed top-0 inset-x-0 z-40 bg-[rgba(8,12,20,0.85)] backdrop-blur-md">
+        <header className="fixed top-0 inset-x-0 z-40 bg-[rgba(6,6,8,0.78)] backdrop-blur-md border-b border-white/5">
           <div className="max-w-7xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
             <Link to="/" className="font-display text-[22px] text-white tracking-tight">
               Virello
