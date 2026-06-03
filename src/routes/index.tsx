@@ -649,7 +649,14 @@ function Pricing() {
                 {pkg.name}
               </h3>
               <div className="flex items-baseline gap-1 mb-2">
-                {pkg.pricePrefix && <span className="text-caption">{pkg.pricePrefix}</span>}
+                {pkg.pricePrefix && (
+                  <span
+                    className="text-caption"
+                    style={{ fontSize: "0.8125rem", color: "rgba(240,244,255,0.55)" }}
+                  >
+                    {pkg.pricePrefix}
+                  </span>
+                )}
                 <span style={{ fontWeight: 800, fontSize: "1.75rem", letterSpacing: "-0.04em" }}>
                   {formatUGX(pkg.price)}
                 </span>
@@ -713,6 +720,7 @@ function Pricing() {
                     whiteSpace: "nowrap",
                   }}
                 >
+                  {a.pricePrefix}
                   {formatUGX(a.price)}
                   <span className="text-caption" style={{ marginLeft: 2 }}>
                     {a.unit}
@@ -723,7 +731,7 @@ function Pricing() {
           </div>
         </div>
         <p className="rv text-caption" style={{ textAlign: "center", marginTop: "1rem" }}>
-          All prices in Ugandan Shillings · No hidden fees · No retainers
+          50% upfront · 50% on completion · All prices in Ugandan Shillings · No hidden fees
         </p>
       </div>
     </section>
