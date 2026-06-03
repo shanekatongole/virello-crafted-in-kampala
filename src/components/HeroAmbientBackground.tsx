@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { usePrefersReducedMotion } from "@/hooks/use-performance";
 import type { PerfTier } from "@/lib/performance";
 
-/** Local copy of reference: Pinterest liquid-glass / warp-speed ambient loop */
-export const HERO_AMBIENT_GIF = "/media/hero-ambient.gif";
+/** Cinematic hero loop — encoded as MP4/WebM (was a 55MB GIF). */
+export const HERO_AMBIENT_MP4 = "/media/hero-ambient.mp4";
+export const HERO_AMBIENT_WEBM = "/media/hero-ambient.webm";
+export const HERO_AMBIENT_POSTER = "/media/hero-ambient-poster.jpg";
 
 type Props = {
   /** When false (hidden tab), animation is not rendered to save CPU/GPU */
@@ -12,14 +14,28 @@ type Props = {
   tier: PerfTier;
 };
 
+function usePrefersReducedData(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-data: reduce)");
+    setReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
+  }, []);
+  return reduced;
+}
+
 /**
  * Full-bleed cinematic hero background using the reference GIF.
  * Scoped to the hero only — does not run across the whole page.
  */
 export function HeroAmbientBackground({ active, tier }: Props) {
   const reducedMotion = usePrefersReducedMotion();
+  const reducedData = usePrefersReducedData();
   const [isDesktop, setIsDesktop] = useState(false);
-  const [canLoadMotion, setCanLoadMotion] = useState(false);
+  const [canLoadVideo, setCanLoadVideo] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -31,8 +47,8 @@ export function HeroAmbientBackground({ active, tier }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!active || tier !== "high" || !isDesktop || reducedMotion) {
-      setCanLoadMotion(false);
+    if (!active || tier !== "high" || !isDesktop || reducedMotion || reducedData) {
+      setCanLoadVideo(false);
       return;
     }
 
@@ -42,16 +58,18 @@ export function HeroAmbientBackground({ active, tier }: Props) {
     };
 
     if (win.requestIdleCallback) {
-      const handle = win.requestIdleCallback(() => setCanLoadMotion(true), { timeout: 1800 });
+      const handle = win.requestIdleCallback(() => setCanLoadVideo(true), { timeout: 1800 });
       return () => win.cancelIdleCallback?.(handle);
     }
 
-    const handle = window.setTimeout(() => setCanLoadMotion(true), 900);
+    const handle = window.setTimeout(() => setCanLoadVideo(true), 900);
     return () => window.clearTimeout(handle);
-  }, [active, isDesktop, reducedMotion, tier]);
+  }, [active, isDesktop, reducedMotion, reducedData, tier]);
 
-  // Load the heavy GIF only after initial paint, on desktop, and on high-performance devices.
-  const loadGif = active && tier === "high" && isDesktop && !reducedMotion && canLoadMotion;
+  // Load the video only after initial paint, on desktop, on high-tier devices,
+  // and only when the user hasn't asked for reduced motion / reduced data.
+  const loadVideo =
+    active && tier === "high" && isDesktop && !reducedMotion && !reducedData && canLoadVideo;
 
   if (reducedMotion) {
     return (
@@ -64,16 +82,20 @@ export function HeroAmbientBackground({ active, tier }: Props) {
 
   return (
     <div className="hero-ambient" aria-hidden>
-      {loadGif ? (
-        <img
-          src={HERO_AMBIENT_GIF}
-          alt=""
+      {loadVideo ? (
+        <video
           className="hero-ambient-gif"
-          width={1920}
-          height={1080}
-          decoding="async"
-          fetchPriority="low"
-        />
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          poster={HERO_AMBIENT_POSTER}
+          aria-hidden
+        >
+          <source src={HERO_AMBIENT_WEBM} type="video/webm" />
+          <source src={HERO_AMBIENT_MP4} type="video/mp4" />
+        </video>
       ) : (
         /* Highly performant, beautiful liquid CSS gradients fallback */
         <div className="hero-ambient-css-fallback">
