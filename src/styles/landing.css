@@ -62,12 +62,16 @@
   margin: 0;
 }
 
-.heading-hero-line {
+.heading-hero-line,
+.heading-hero-line.clip-line {
   overflow: hidden;
-  /* Generous padding so italic descenders (e.g. the "g" in "digital") aren't clipped */
-  padding-bottom: 0.3em;
+  /* Generous line-height + padding so descenders (e.g. the italic "g"
+     in "digital", or "design") aren't clipped by overflow:hidden.
+     The .clip-line selector in styles.css would otherwise force
+     line-height: 1.05 and crop the descenders. */
+  line-height: 1.3;
+  padding-bottom: 0.35em;
   margin-bottom: -0.25em;
-  line-height: 1.25;
 }
 
 .heading-hero-word {
