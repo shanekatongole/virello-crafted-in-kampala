@@ -68,7 +68,12 @@ function Nav() {
 
   /* Scrolled state */
   useEffect(() => {
-    const fn = () => ref.current?.classList.toggle("scrolled", scrollY > 30);
+    const fn = () => {
+      ref.current?.classList.toggle("scrolled", scrollY > 30);
+      // While near the very top of the page, no section should appear active
+      // (the hero is showing — none of the nav targets are in view yet).
+      if (scrollY < 160) setActive(null);
+    };
     fn();
     addEventListener("scroll", fn, { passive: true });
     return () => removeEventListener("scroll", fn);
