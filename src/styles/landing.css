@@ -64,9 +64,10 @@
 
 .heading-hero-line {
   overflow: hidden;
-  padding-bottom: 0.15em;
-  margin-bottom: -0.15em;
-  line-height: 1.2;
+  /* Generous padding so italic descenders (e.g. the "g" in "digital") aren't clipped */
+  padding-bottom: 0.3em;
+  margin-bottom: -0.25em;
+  line-height: 1.25;
 }
 
 .heading-hero-word {
