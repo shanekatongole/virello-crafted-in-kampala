@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { usePrefersReducedMotion } from "@/hooks/use-performance";
-import type { PerfTier } from "@/lib/performance";
 
 /** Cinematic hero loop — encoded as MP4/WebM (was a 55MB GIF). */
 export const HERO_AMBIENT_MP4 = "/media/hero-ambient.mp4";
@@ -10,8 +9,6 @@ export const HERO_AMBIENT_POSTER = "/media/hero-ambient-poster.jpg";
 type Props = {
   /** When false (hidden tab), animation is not rendered to save CPU/GPU */
   active: boolean;
-  /** Current performance tier of the browser */
-  tier: PerfTier;
 };
 
 function usePrefersReducedData(): boolean {
@@ -31,23 +28,13 @@ function usePrefersReducedData(): boolean {
  * Full-bleed cinematic hero background using the reference GIF.
  * Scoped to the hero only — does not run across the whole page.
  */
-export function HeroAmbientBackground({ active, tier }: Props) {
+export function HeroAmbientBackground({ active }: Props) {
   const reducedMotion = usePrefersReducedMotion();
   const reducedData = usePrefersReducedData();
-  const [isDesktop, setIsDesktop] = useState(false);
   const [canLoadVideo, setCanLoadVideo] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(min-width: 1024px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  useEffect(() => {
-    if (!active || tier !== "high" || !isDesktop || reducedMotion || reducedData) {
+    if (!active || reducedMotion || reducedData) {
       setCanLoadVideo(false);
       return;
     }
@@ -58,18 +45,17 @@ export function HeroAmbientBackground({ active, tier }: Props) {
     };
 
     if (win.requestIdleCallback) {
-      const handle = win.requestIdleCallback(() => setCanLoadVideo(true), { timeout: 1800 });
+      const handle = win.requestIdleCallback(() => setCanLoadVideo(true), { timeout: 1200 });
       return () => win.cancelIdleCallback?.(handle);
     }
 
-    const handle = window.setTimeout(() => setCanLoadVideo(true), 900);
+    const handle = window.setTimeout(() => setCanLoadVideo(true), 600);
     return () => window.clearTimeout(handle);
-  }, [active, isDesktop, reducedMotion, reducedData, tier]);
+  }, [active, reducedMotion, reducedData]);
 
-  // Load the video only after initial paint, on desktop, on high-tier devices,
-  // and only when the user hasn't asked for reduced motion / reduced data.
-  const loadVideo =
-    active && tier === "high" && isDesktop && !reducedMotion && !reducedData && canLoadVideo;
+  // Load the video after initial paint on every device, unless the user has
+  // asked for reduced motion or reduced data.
+  const loadVideo = active && !reducedMotion && !reducedData && canLoadVideo;
 
   if (reducedMotion) {
     return (
