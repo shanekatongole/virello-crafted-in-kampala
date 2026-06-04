@@ -200,6 +200,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             logo: `${siteUrl}/og-cover.jpg`,
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Virello",
+            url: siteUrl,
+            description:
+              "Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa.",
+          }),
+        },
       ],
     };
   },

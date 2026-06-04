@@ -1,0 +1,15 @@
+# Virello
+
+> Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa.
+
+## Pages
+
+- [Home](/): Studio overview, selected works, services, and pricing.
+
+## Work
+
+- [Lenore Estates](/work/lenore-estates): Real estate website case study.
+- [Smart Ideas](/work/smart-ideas): Brand and web case study.
+- [Metafit256](/work/metafit256): Fitness brand site case study.
+- [Roofman UG](/work/roofman-ug): Roofing company site case study.
+- [Silverfin](/work/silverfin): Finance brand site case study.
