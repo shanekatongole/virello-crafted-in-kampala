@@ -634,7 +634,7 @@ function Pricing() {
                   className="lg-tag"
                   style={{
                     position: "absolute",
-                    top: -12,
+                    top: 14,
                     left: "50%",
                     transform: "translateX(-50%)",
                     background: "linear-gradient(135deg, #d4af37, #a8862a)",
