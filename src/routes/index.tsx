@@ -5,7 +5,6 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { CopyEmail } from "@/components/ui/copy-email";
 import { useAmbientMotionPause, usePageVisible, usePerfTier } from "@/hooks/use-performance";
 import { PROJECTS } from "@/lib/projects";
-import type { PerfTier } from "@/lib/performance";
 import { ProjectPreview } from "@/components/ProjectPreview";
 import {
   STUDIO_EMAIL,
