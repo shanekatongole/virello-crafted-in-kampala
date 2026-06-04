@@ -5,7 +5,6 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { CopyEmail } from "@/components/ui/copy-email";
 import { useAmbientMotionPause, usePageVisible, usePerfTier } from "@/hooks/use-performance";
 import { PROJECTS } from "@/lib/projects";
-import type { PerfTier } from "@/lib/performance";
 import { ProjectPreview } from "@/components/ProjectPreview";
 import {
   STUDIO_EMAIL,
@@ -248,10 +247,10 @@ function StatPill({
   );
 }
 
-function Hero({ motionActive, tier }: { motionActive: boolean; tier: PerfTier }) {
+function Hero({ motionActive }: { motionActive: boolean }) {
   return (
     <section id="top" className="hero">
-      <HeroAmbientBackground active={motionActive} tier={tier} />
+      <HeroAmbientBackground active={motionActive} />
       <div className="hero-inner">
         <div className="hero-meta en" style={{ animationDelay: ".3s" }}>
           <span className="flex items-center gap-2.5 min-w-0">
@@ -925,7 +924,7 @@ function Footer() {
 function Index() {
   const tier = usePerfTier();
   const pageVisible = usePageVisible();
-  const motionActive = pageVisible && tier !== "low";
+  const motionActive = pageVisible;
   useAmbientMotionPause(motionActive);
   useReveal();
 
@@ -936,7 +935,7 @@ function Index() {
       {showGrain && <div className="grain" aria-hidden />}
       <Nav />
       <main>
-        <Hero motionActive={motionActive} tier={tier} />
+        <Hero motionActive={motionActive} />
         <Marquee />
         <section id="work" className="section section-paint">
           <div className="site-container" style={{ paddingInline: 0, width: "100%" }}>
