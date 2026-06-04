@@ -621,10 +621,12 @@ function Pricing() {
               className={`price-card refract-ring lg-card lg-card--blur rv ${pkg.highlight ? "lg-card--highlight" : ""}`.trim()}
               data-d={i * 80}
               style={{
-                padding: "1.75rem 1.5rem 1.5rem",
+                padding: pkg.highlight ? "2.5rem 1.5rem 2rem" : "1.75rem 1.5rem 1.5rem",
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
+                marginTop: pkg.highlight ? "-0.75rem" : 0,
+                marginBottom: pkg.highlight ? "-0.75rem" : 0,
               }}
             >
               {pkg.highlight && (
