@@ -1,22 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
+import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { getSiteUrl } from "@/lib/site-url";
 
 function NotFoundComponent() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center px-4"
-      style={{ background: "#050505" }}
-    >
+    <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "#050505" }}>
       <div className="max-w-md text-center">
         <h1
           style={{
@@ -71,10 +61,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   return (
-    <div
-      className="flex min-h-screen items-center justify-center px-4"
-      style={{ background: "#050505" }}
-    >
+    <div className="flex min-h-screen items-center justify-center px-4" style={{ background: "#050505" }}>
       <div className="max-w-md text-center">
         <h1
           style={{
@@ -150,6 +137,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "Virello is a Kampala-based web design studio building fast, polished websites and digital products for businesses across East Africa.",
         },
         { name: "author", content: "Virello" },
+        { name: "google-site-verification", content: "RFk3Zd1hIWHHdKFUmudh71_EEAPuETltBUUwYG1R_Lk" },
         { property: "og:site_name", content: "Virello" },
         { property: "og:title", content: "Virello — Web Design Studio, Kampala" },
         {
@@ -189,8 +177,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             name: "Virello",
             url: siteUrl,
             email: "katongoleshane@gmail.com",
-            description:
-              "Web design studio building websites and digital products for businesses across East Africa.",
+            description: "Web design studio building websites and digital products for businesses across East Africa.",
             address: {
               "@type": "PostalAddress",
               addressLocality: "Kampala",
